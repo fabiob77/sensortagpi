@@ -509,8 +509,8 @@ def iothub_client_telemetry_sample_run():
 
         while True:
             # Build the message with simulated telemetry values.
-            temperature = tAmb + (random.random() * 15)
-            humidity = RH + (random.random() * 20)
+            temperature = tAmb
+            humidity = RH
             msg_txt_formatted = MSG_TXT % (temperature, humidity)
             message = IoTHubMessage(msg_txt_formatted)
 
