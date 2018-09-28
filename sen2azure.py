@@ -482,9 +482,9 @@ def main():
         tag.lightmeter.enable()
 
 # Define the JSON message to send to IoT Hub.
-if arg.temperature or arg.all:
+    if arg.temperature or arg.all:
            TEMPERATURE =  tag.IRtemperature.read()
-       if arg.humidity or arg.all:
+    if arg.humidity or arg.all:
            HUMIDITY = tag.humidity.read()
 MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
         def send_confirmation_callback(message, result, user_context):
