@@ -1,7 +1,6 @@
 from bluepy.btle import UUID, Peripheral, DefaultDelegate, AssignedNumbers
 import struct
 import math
-
 import random
 import time
 import sys
@@ -19,6 +18,9 @@ from iothub_client import IoTHubMessage, IoTHubMessageDispositionResult, IoTHubE
 # az iot hub device-identity show-connection-string --hub-name {YourIoTHubName} --device-id MyNodeDevice --output table
 CONNECTION_STRING = "HostName=fbhub001.azure-devices.net;DeviceId=CC2541-fb-Room2;SharedAccessKey=q8wg+U5a+oZaPxEMmuOr7xa8zTgILqhXMa8yiqdCgBY="
 
+# Using the MQTT protocol.
+PROTOCOL = IoTHubTransportProvider.MQTT
+MESSAGE_TIMEOUT = 10000
 
 def _TI_UUID(val):
     return UUID("%08X-0451-4000-b000-000000000000" % (0xF0000000+val))
@@ -77,8 +79,7 @@ class IRTemperatureSensor(SensorBase):
         self.S0 = 6.4e-14
 
     def read(self):
-        '''Returns (ambient_temp) degC'''
-
+        '''Returns (ambient_temp) in degC'''
         # See http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#IR_Temperature_Sensor
         (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         tAmb = rawTamb / 128.0
@@ -186,11 +187,11 @@ class HumiditySensor(SensorBase):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns ( rel_humidity)'''
+        '''Returns (ambient_temp, rel_humidity)'''
         (rawT, rawH) = struct.unpack('<HH', self.data.read())
         temp = -46.85 + 175.72 * (rawT / 65536.0)
         RH = -6.0 + 125.0 * ((rawH & 0xFFFC)/65536.0)
-        return (RH)
+        return (temp, RH)
 
 class HumiditySensorHDC1000(SensorBase):
     svcUUID  = _TI_UUID(0xAA20)
@@ -201,11 +202,11 @@ class HumiditySensorHDC1000(SensorBase):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (rel_humidity)'''
+        '''Returns (ambient_temp, rel_humidity)'''
         (rawT, rawH) = struct.unpack('<HH', self.data.read())
         temp = -40.0 + 165.0 * (rawT / 65536.0)
         RH = 100.0 * (rawH/65536.0)
-        return (RH)
+        return (temp, RH)
 
 class MagnetometerSensor(SensorBase):
     svcUUID  = _TI_UUID(0xAA30)
@@ -486,37 +487,9 @@ def main():
     # Not waiting here after enabling a sensor, the first read value might be empty or incorrect.
     time.sleep(1.0)
 
-    counter=1
-    while True:
-       if arg.temperature or arg.all:
-           print('Temp: ', tag.IRtemperature.read())
-       if arg.humidity or arg.all:
-           print("Humidity: ", tag.humidity.read())
-       if arg.barometer or arg.all:
-           print("Barometer: ", tag.barometer.read())
-       if arg.accelerometer or arg.all:
-           print("Accelerometer: ", tag.accelerometer.read())
-       if arg.magnetometer or arg.all:
-           print("Magnetometer: ", tag.magnetometer.read())
-       if arg.gyroscope or arg.all:
-           print("Gyroscope: ", tag.gyroscope.read())
-       if (arg.light or arg.all) and tag.lightmeter is not None:
-           print("Light: ", tag.lightmeter.read())
-       if arg.battery or arg.all:
-           print("Battery: ", tag.battery.read())
-       if counter >= arg.count and arg.count != 0:
-           break
-       counter += 1
-       tag.waitForNotifications(arg.t)
-   # Using the MQTT protocol.
-PROTOCOL = IoTHubTransportProvider.MQTT
-MESSAGE_TIMEOUT = 10000
-
 # Define the JSON message to send to IoT Hub.
-#TEMPERATURE = 20.0
-#HUMIDITY = 60
-TEMPERATURE = tAmb
-HUMIDITY = RH
+TEMPERATURE = 20.0
+HUMIDITY = 60
 MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
 
 def send_confirmation_callback(message, result, user_context):
@@ -524,6 +497,7 @@ def send_confirmation_callback(message, result, user_context):
 
 def iothub_client_init():
     # Create an IoT Hub client
+   # client.set_option("auto_url_encode_decode", True)
     client = IoTHubClient(CONNECTION_STRING, PROTOCOL)
     return client
 
@@ -535,8 +509,8 @@ def iothub_client_telemetry_sample_run():
 
         while True:
             # Build the message with simulated telemetry values.
-            temperature = TEMPERATURE
-            humidity = HUMIDITY
+            temperature = TEMPERATURE + (random.random() * 15)
+            humidity = HUMIDITY + (random.random() * 20)
             msg_txt_formatted = MSG_TXT % (temperature, humidity)
             message = IoTHubMessage(msg_txt_formatted)
 
@@ -560,10 +534,33 @@ def iothub_client_telemetry_sample_run():
         print ( "IoTHubClient sample stopped" )
 
 if __name__ == '__main__':
-    print ( "CC2541 Room2" )
+    print ( "IoT Hub Quickstart #1 - Simulated device" )
     print ( "Press Ctrl-C to exit" )
     iothub_client_telemetry_sample_run()
-    
+
+    counter=1
+    while True:
+       if arg.temperature or arg.all:
+           print('Temp: ', tag.IRtemperature.read())
+       if arg.humidity or arg.all:
+           print("Humidity: ", tag.humidity.read())
+       if arg.barometer or arg.all:
+           print("Barometer: ", tag.barometer.read())
+       if arg.accelerometer or arg.all:
+           print("Accelerometer: ", tag.accelerometer.read())
+       if arg.magnetometer or arg.all:
+           print("Magnetometer: ", tag.magnetometer.read())
+       if arg.gyroscope or arg.all:
+           print("Gyroscope: ", tag.gyroscope.read())
+       if (arg.light or arg.all) and tag.lightmeter is not None:
+           print("Light: ", tag.lightmeter.read())
+       if arg.battery or arg.all:
+           print("Battery: ", tag.battery.read())
+       if counter >= arg.count and arg.count != 0:
+           break
+       counter += 1
+       tag.waitForNotifications(arg.t)
+
     tag.disconnect()
     del tag
 
