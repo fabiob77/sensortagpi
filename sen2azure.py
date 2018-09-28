@@ -485,13 +485,6 @@ def main():
     # Not waiting here after enabling a sensor, the first read value might be empty or incorrect.
     time.sleep(1.0)
 
-    counter=1
-    while True:
-       if arg.temperature or arg.all:
-           print('Temp: ', tag.IRtemperature.read())
-           
-       if arg.humidity or arg.all:
-           print("Humidity: ", tag.humidity.read())
                   # Define the JSON message to send to IoT Hub.
 MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
 
@@ -540,7 +533,12 @@ if __name__ == '__main__':
     print ( "IoT Hub  - real device" )
     print ( "Press Ctrl-C to exit" )
     iothub_client_telemetry_sample_run()
-    
+    counter=1
+    while True:
+       if arg.temperature or arg.all:
+           print('Temp: ', tag.IRtemperature.read())
+       if arg.humidity or arg.all:
+           print("Humidity: ", tag.humidity.read())
        if arg.barometer or arg.all:
            print("Barometer: ", tag.barometer.read())
        if arg.accelerometer or arg.all:
