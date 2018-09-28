@@ -487,7 +487,7 @@ def main():
     if arg.humidity or arg.all:
            HUMIDITY = tag.humidity.read()
 MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
-        def send_confirmation_callback(message, result, user_context):
+def send_confirmation_callback(message, result, user_context):
     print ( "IoT Hub responded to message with status: %s" % (result) )
 
 def iothub_client_init():
