@@ -89,6 +89,7 @@ class IRTemperatureSensor(SensorBase):
         S   = self.S0 * calcPoly(self.Apoly, tDie-self.tRef)
         Vos = calcPoly(self.Bpoly, tDie-self.tRef)
         fObj = calcPoly(self.Cpoly, Vobj-Vos)
+
         # Define the JSON message to send to IoT Hub.
 MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
 
@@ -138,7 +139,7 @@ if __name__ == '__main__':
     print ( "Press Ctrl-C to exit" )
     iothub_client_telemetry_sample_run()
 
-        return (tAmb)
+    return (tAmb)
 
 
 class IRTemperatureSensorTMP007(SensorBase):
