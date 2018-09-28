@@ -508,14 +508,7 @@ def main():
            break
        counter += 1
        tag.waitForNotifications(arg.t)
-
-    tag.disconnect()
-    del tag
-
-if __name__ == "__main__":
-    main()
-
-    # Using the MQTT protocol.
+   # Using the MQTT protocol.
 PROTOCOL = IoTHubTransportProvider.MQTT
 MESSAGE_TIMEOUT = 10000
 
@@ -570,14 +563,9 @@ if __name__ == '__main__':
     print ( "CC2541 Room2" )
     print ( "Press Ctrl-C to exit" )
     iothub_client_telemetry_sample_run()
+    
+    tag.disconnect()
+    del tag
 
-
-
-#
-
-
-
-
-
-
-
+if __name__ == "__main__":
+    main()
