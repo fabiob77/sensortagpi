@@ -504,18 +504,18 @@ def iothub_client_telemetry_sample_run():
 
         while True:
             # Build the message with simulated telemetry values.
-            temperature = IRTemperatureSensor
-            humidity = HumiditySensor
-            #msg_txt_formatted = MSG_TXT % (temperature, humidity)
+            temperature = IRTemperatureSensor()
+            humidity = HumiditySensor()
+            msg_txt_formatted = MSG_TXT % (temperature, humidity)
             message = IoTHubMessage(msg_txt_formatted)
 
             # Add a custom application property to the message.
             # An IoT hub can filter on these properties without access to the message body.
-            #prop_map = message.properties()
-            #if temperature > 30:
-            #  prop_map.add("temperatureAlert", "true")
-            #else:
-            #  prop_map.add("temperatureAlert", "false")
+            prop_map = message.properties()
+            if temperature > 30:
+              prop_map.add("temperatureAlert", "true")
+            else:
+              prop_map.add("temperatureAlert", "false")
 
             # Send the message.
             print( "Sending message: %s" % message.get_string() )
