@@ -488,8 +488,8 @@ def main():
     time.sleep(1.0)
 
 # Define the JSON message to send to IoT Hub.
-TEMPERATURE = 20.0
-HUMIDITY = 60
+TEMPERATURE = tAmb
+HUMIDITY = RH
 MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
 
 def send_confirmation_callback(message, result, user_context):
