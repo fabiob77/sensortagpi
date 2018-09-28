@@ -488,8 +488,8 @@ def main():
     time.sleep(1.0)
 
 # Define the JSON message to send to IoT Hub.
-TEMPERATURE = tAmb
-HUMIDITY = RH
+#TEMPERATURE = tAmb
+#HUMIDITY = RH
 MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
 
 def send_confirmation_callback(message, result, user_context):
@@ -509,8 +509,8 @@ def iothub_client_telemetry_sample_run():
 
         while True:
             # Build the message with simulated telemetry values.
-            temperature = TEMPERATURE + (random.random() * 15)
-            humidity = HUMIDITY + (random.random() * 20)
+            temperature = tAmb + (random.random() * 15)
+            humidity = RH + (random.random() * 20)
             msg_txt_formatted = MSG_TXT % (temperature, humidity)
             message = IoTHubMessage(msg_txt_formatted)
 
