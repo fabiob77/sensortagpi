@@ -486,39 +486,22 @@ def main():
     # Some sensors (e.g., temperature, accelerometer) need some time for initialization.
     # Not waiting here after enabling a sensor, the first read value might be empty or incorrect.
     time.sleep(1.0)
-
     counter=1
     while True:
        if arg.temperature or arg.all:
            print('Temp: ', tag.IRtemperature.read())
        if arg.humidity or arg.all:
            print("Humidity: ", tag.humidity.read())
-       if arg.barometer or arg.all:
-           print("Barometer: ", tag.barometer.read())
-       if arg.accelerometer or arg.all:
-           print("Accelerometer: ", tag.accelerometer.read())
-       if arg.magnetometer or arg.all:
-           print("Magnetometer: ", tag.magnetometer.read())
-       if arg.gyroscope or arg.all:
-           print("Gyroscope: ", tag.gyroscope.read())
-       if (arg.light or arg.all) and tag.lightmeter is not None:
-           print("Light: ", tag.lightmeter.read())
-       if arg.battery or arg.all:
-           print("Battery: ", tag.battery.read())
        if counter >= arg.count and arg.count != 0:
            break
        counter += 1
-       tag.waitForNotifications(arg.t)
-
-    tag.disconnect()
-    del tag
-
-if __name__ == "__main__":
-    main()
+       tag.waitForNotifications(arg.t)       
+       if __name__ == "__main__":
+            main()
 
 # Define the JSON message to send to IoT Hub.
-TEMPERATURE = 20.0
-HUMIDITY = 60
+TEMPERATURE = tag.IRtemperature.read()
+HUMIDITY = tag.humidity.read
 MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
 
 def send_confirmation_callback(message, result, user_context):
@@ -563,6 +546,9 @@ def iothub_client_telemetry_sample_run():
         print ( "IoTHubClient sample stopped" )
 
 if __name__ == '__main__':
-    print ( "IoT Hub Quickstart #1 - Simulated device" )
+    print ( "IoT Hub Quickstart #1 - R device" )
     print ( "Press Ctrl-C to exit" )
     iothub_client_telemetry_sample_run()
+        
+    tag.disconnect()
+    del tag
