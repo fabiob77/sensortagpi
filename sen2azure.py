@@ -511,8 +511,8 @@ def main():
        counter += 1
        tag.waitForNotifications(arg.t)
 # Define the JSON message to send to IoT Hub.
-TEMPERATURE = (tag.IRtemperature.read())
-HUMIDITY = (tag.humidity.read())
+temperature = "tag.IRtemperature.read()"
+humidity = "tag.humidity.read()"
 MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
 MSG_TXT_formatted = MSG_TXT
 
@@ -533,8 +533,8 @@ def iothub_client_telemetry_sample_run():
 
         while True:
             # Build the message with real telemetry values.
-            temperature = TEMPERATURE
-            humidity = HUMIDITY
+            #temperature = TEMPERATURE
+            #humidity = HUMIDITY
             #MSG_TXT_formatted = "{\"TEMPERATURE\": %.2f,\"HUMIDITY\": %.2f}"
             #msg_txt_formatted = MSG_TXT % ('temperature', 'humidity')
             message = IoTHubMessage(MSG_TXT_formatted)
