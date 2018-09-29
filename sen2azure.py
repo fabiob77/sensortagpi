@@ -510,6 +510,9 @@ def main():
            break
        counter += 1
        tag.waitForNotifications(arg.t)
+       
+    tag.disconnect()
+    del tag
 # Define the JSON message to send to IoT Hub.
 temperature = "tag.IRtemperature.read()"
 humidity = "tag.humidity.read()"
@@ -562,9 +565,6 @@ if __name__ == '__main__':
     print ( "IoT Hub Quickstart #1 - Real device" )
     print ( "Press Ctrl-C to exit" )
     iothub_client_telemetry_sample_run()
-
-    tag.disconnect()
-    del tag
 
 if __name__ == "__main__":
     main()
