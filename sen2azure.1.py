@@ -79,38 +79,28 @@ class IRTemperatureSensor(SensorBase):
         self.S0 = 6.4e-14
 
     def read(self):
-        '''Returns (ambient_temp, target_temp) in degC'''
+        '''Returns (ambient_temp) in degC'''
         # See http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#IR_Temperature_Sensor
-        (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
+        rawTamb = struct.unpack('<hh', self.data.read())
         tAmb = rawTamb / 128.0
-        Vobj = 1.5625e-7 * rawVobj
-
-        tDie = tAmb + self.zeroC
-        S   = self.S0 * calcPoly(self.Apoly, tDie-self.tRef)
-        Vos = calcPoly(self.Bpoly, tDie-self.tRef)
-        fObj = calcPoly(self.Cpoly, Vobj-Vos)
-
-        tObj = math.pow( math.pow(tDie,4.0) + (fObj/S), 0.25 )
-        return (tAmb, tObj - self.zeroC)
-
+        return (tAmb)
 
 class IRTemperatureSensorTMP007(SensorBase):
     svcUUID  = _TI_UUID(0xAA00)
     dataUUID = _TI_UUID(0xAA01)
     ctrlUUID = _TI_UUID(0xAA02)
 
-    SCALE_LSB = 0.03125;
+    SCALE_LSB = 0.03125
  
     def __init__(self, periph):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (ambient_temp, target_temp) in degC'''
+        '''Returns (ambient_temp) in degC'''
         # http://processors.wiki.ti.com/index.php/CC2650_SensorTag_User's_Guide?keyMatch=CC2650&tisearch=Search-EN
-        (rawTobj, rawTamb) = struct.unpack('<hh', self.data.read())
-        tObj = (rawTobj >> 2) * self.SCALE_LSB;
-        tAmb = (rawTamb >> 2) * self.SCALE_LSB;
-        return (tAmb, tObj)
+        rawTamb = struct.unpack('<hh', self.data.read())
+        tAmb = (rawTamb >> 2) * self.SCALE_LSB
+        return (tAmb)
 
 class AccelerometerSensor(SensorBase):
     svcUUID  = _TI_UUID(0xAA10)
@@ -175,9 +165,6 @@ class AccelerometerSensorMPU9250:
         '''Returns (x_accel, y_accel, z_accel) in units of g'''
         rawVals = self.sensor.rawRead()[3:6]
         return tuple([ v*self.scale for v in rawVals ])
-
-
-
 class HumiditySensor(SensorBase):
     svcUUID  = _TI_UUID(0xAA20)
     dataUUID = _TI_UUID(0xAA21)
@@ -344,8 +331,8 @@ class OpticalSensorOPT3001(SensorBase):
     def read(self):
         '''Returns value in lux'''
         raw = struct.unpack('<h', self.data.read()) [0]
-        m = raw & 0xFFF;
-        e = (raw & 0xF000) >> 12;
+        m = raw & 0xFFF
+        e = (raw & 0xF000) >> 12
         return 0.01 * (m << e)
 
 class BatterySensor(SensorBase):
@@ -545,6 +532,6 @@ def main():
         
     tag.disconnect()
     del tag
-    
+
 if __name__ == "__main__":
     main()
