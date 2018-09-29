@@ -491,10 +491,10 @@ def main():
     while True:
        if arg.temperature or arg.all:
            print('Temp: ', tag.IRtemperature.read())
-           temperature = (tag.IRtemperature.read()))
+           temperature = (tag.IRtemperature.read())
        if arg.humidity or arg.all:
            print("Humidity: ", tag.humidity.read())
-           humidity = (tag.humidity.read()))
+           humidity = (tag.humidity.read())
        if arg.barometer or arg.all:
            print("Barometer: ", tag.barometer.read())
        if arg.accelerometer or arg.all:
