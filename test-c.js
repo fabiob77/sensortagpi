@@ -1,4 +1,5 @@
 var SensorTag = require('./index');
+var async = require('async');
 
 function sensorTagDisovered(sensorTag) {
   console.log('discovered: ' + sensorTag);
