@@ -6,10 +6,10 @@ var SensorTag = require('./index');
 
 var USE_READ = true;
 
-SensorTag.discover(function(sensorTag) {
+function sensorTagDisovered(sensorTag) {
   console.log('discovered: ' + sensorTag);
 
-  sensorTag.on('disconnect', function() {
+sensorTag.on('disconnect', function() {
     console.log('disconnected!');
     process.exit(0);
   });
@@ -102,10 +102,6 @@ SensorTag.discover(function(sensorTag) {
           });
         }
       },
-      //function(callback) {
-      //  console.log('disableIrTemperature');
-      //  sensorTag.disableIrTemperature(callback);
-      //},
       function(callback) {
         console.log('enableAccelerometer');
         sensorTag.enableAccelerometer(callback);
@@ -142,10 +138,6 @@ SensorTag.discover(function(sensorTag) {
           });
         }
       },
-      //function(callback) {
-      //  console.log('disableAccelerometer');
-      //  sensorTag.disableAccelerometer(callback);
-      //},
       function(callback) {
         console.log('enableHumidity');
         sensorTag.enableHumidity(callback);
@@ -180,50 +172,6 @@ SensorTag.discover(function(sensorTag) {
           });
         }
       },
-     // function(callback) {
-     //   console.log('disableHumidity');
-      //  sensorTag.disableHumidity(callback);
-      //},
-      //function(callback) {
-      //  console.log('enableMagnetometer');
-      //  sensorTag.enableMagnetometer(callback);
-     // },
-      //function(callback) {
-      //  setTimeout(callback, 2000);
-      //},
-      //function(callback) {
-      //  if (USE_READ) {
-       //   console.log('readMagnetometer');
-       //   sensorTag.readMagnetometer(function(error, x, y, z) {
-       //     console.log('\tx = %d μT', x.toFixed(1));
-       //     console.log('\ty = %d μT', y.toFixed(1));
-        //    console.log('\tz = %d μT', z.toFixed(1));
-
- //           callback();
-   //       });
-     //   } else {
-      //    sensorTag.on('magnetometerChange', function(x, y, z) {
-       //     console.log('\tx = %d μT', x.toFixed(1));
-        //    console.log('\ty = %d μT', y.toFixed(1));
-         //   console.log('\tz = %d μT', z.toFixed(1));
-         // });
-
- //         console.log('setMagnetometerPeriod');
-  //        sensorTag.setMagnetometerPeriod(500, function(error) {
-    //        console.log('notifyMagnetometer');
-      //      sensorTag.notifyMagnetometer(function(error) {
-        //      setTimeout(function() {
-          //      console.log('unnotifyMagnetometer');
-            //    sensorTag.unnotifyMagnetometer(callback);
-//              }, 5000);
-  //          });
-    //      });
-      //  }
-    //  },
-    //  function(callback) {
-     //   console.log('disableMagnetometer');
-     //   sensorTag.disableMagnetometer(callback);
-     // },
       function(callback) {
         console.log('enableBarometricPressure');
         sensorTag.enableBarometricPressure(callback);
@@ -256,51 +204,7 @@ SensorTag.discover(function(sensorTag) {
           });
         }
       },
-   //   function(callback) {
-   //     console.log('disableBarometricPressure');
-   //     sensorTag.disableBarometricPressure(callback);
-  //    },
-  //    function(callback) {
-  //      console.log('enableGyroscope');
-  //      sensorTag.enableGyroscope(callback);
-  //    },
-  //    function(callback) {
-  //      setTimeout(callback, 2000);
-  //    },
-   //   function(callback) {
-   //     if (USE_READ) {
-   //       console.log('readGyroscope');
-    //      sensorTag.readGyroscope(function(error, x, y, z) {
-   //         console.log('\tx = %d °/s', x.toFixed(1));
-     //       console.log('\ty = %d °/s', y.toFixed(1));
-       //     console.log('\tz = %d °/s', z.toFixed(1));
-
-     //       callback();
-      //    });
-    //    } else {
-     //     sensorTag.on('gyroscopeChange', function(x, y, z) {
-      //      console.log('\tx = %d °/s', x.toFixed(1));
-    //        console.log('\ty = %d °/s', y.toFixed(1));
-     //       console.log('\tz = %d °/s', z.toFixed(1));
-     //     });
-
-//          console.log('setGyroscopePeriod');
-  //        sensorTag.setGyroscopePeriod(500, function(error) {
-    //        console.log('notifyGyroscope');
-      //      sensorTag.notifyGyroscope(function(error) {
-        //      setTimeout(function() {
-  //              console.log('unnotifyGyroscope');
-   //             sensorTag.unnotifyGyroscope(callback);
-     //         }, 5000);
-   //         });
-    //      });
-   //     }
-   //   },
-   //   function(callback) {
-    //    console.log('disableGyroscope');
-  //      sensorTag.disableGyroscope(callback);
-  //    },
-      function(callback) {
+       function(callback) {
         if (sensorTag.type === 'cc2540') {
           async.series([
             function(callback) {
@@ -387,26 +291,9 @@ SensorTag.discover(function(sensorTag) {
           callback();
         }
       },
-      function(callback) {
-        console.log('readSimpleRead - waiting for button press ...');
-        sensorTag.on('simpleKeyChange', function(left, right, reedRelay) {
-          console.log('left: ' + left);
-          console.log('right: ' + right);
-          if (sensorTag.type === 'cc2650') {
-            console.log('reed relay: ' + reedRelay);
-          }
-
-          if (left || right) {
-            sensorTag.notifySimpleKey(callback);
-          }
-        });
-
-        sensorTag.notifySimpleKey();
-      },
-      function(callback) {
-        console.log('disconnect');
-        sensorTag.disconnect(callback);
-      }
     ]
-  );
-});
+//}
+);
+}
+// start discovery of a SensorTag
+SensorTag.discover(sensorTagDisovered);
