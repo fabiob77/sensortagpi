@@ -534,10 +534,10 @@ def iothub_client_telemetry_sample_run():
         print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
 
         while True:
-            # Build the message with simulated telemetry values.
+            # Build the message with real telemetry values.
             temperature = TEMPERATURE
             humidity = HUMIDITY
-            msg_txt_formatted = MSG_TXT % (temperature, humidity)
+            msg_txt_formatted = MSG_TXT % ('temperature', 'humidity')
             message = IoTHubMessage(msg_txt_formatted)
 
             # Add a custom application property to the message.
