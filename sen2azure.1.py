@@ -490,9 +490,7 @@ def main():
            print("Humidity: ", tag.humidity.read())
            HUMIDITY = tag.humidity.read()
            # Define the JSON message to send to IoT Hub.
-           print('temperature', TEMPERATURE)
-           print('humidity', HUMIDITY)
-           MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
+           #MSG_TXT = "{\"temperature\": 'TEMPERATURE',\"humidity\": 'HUMIDITY'}"
            def send_confirmation_callback(message, result, user_context):
             print ( "IoT Hub responded to message with status: %s" % (result) )
            
@@ -507,10 +505,10 @@ def main():
               client = iothub_client_init()
               print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
               while True:
-            # Build the message with simulated telemetry values.
+            # Build the message with real telemetry values.
                 temperature = TEMPERATURE
                 humidity = HUMIDITY
-                msg_txt_formatted = MSG_TXT % (temperature, humidity)
+                msg_txt_formatted = (temperature, humidity)
                 message = IoTHubMessage(msg_txt_formatted)
             # Add a custom application property to the message.
             # An IoT hub can filter on these properties without access to the message body.
