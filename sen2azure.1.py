@@ -545,3 +545,6 @@ def main():
         
     tag.disconnect()
     del tag
+    
+if __name__ == "__main__":
+    main()
