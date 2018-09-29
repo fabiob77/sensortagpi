@@ -491,8 +491,12 @@ def main():
     while True:
        if arg.temperature or arg.all:
            print('Temp: ', tag.IRtemperature.read())
+           temperature = tag.IRtemperature.read()
+           MSG_TXT = "{\"temperature\": temperature,\"humidity\": humidity}"
+           MSG_TXT_formatted = MSG_TXT
        if arg.humidity or arg.all:
            print("Humidity: ", tag.humidity.read())
+           humidity = tag.humidity.read()
        if arg.barometer or arg.all:
            print("Barometer: ", tag.barometer.read())
        if arg.accelerometer or arg.all:
@@ -506,58 +510,59 @@ def main():
        if arg.battery or arg.all:
            print("Battery: ", tag.battery.read())
        if counter >= arg.count and arg.count != 0:
-           break
-       counter += 1
-       tag.waitForNotifications(arg.t)
-        # Define the JSON message to send to IoT Hub.
-#temperature = IRTemperatureSensor.read()
-#humidity = HumiditySensor.read()
-temperature = "tag.IRtemperature.read()"
-humidity = "tag.humidity.read()"
-MSG_TXT = "{\"temperature\": temperature,\"humidity\": humidity}"
-MSG_TXT_formatted = MSG_TXT
+           def send_confirmation_callback(message, result, user_context):
+            print ( "IoT Hub responded to message with status: %s" % (result) )
 
-def send_confirmation_callback(message, result, user_context):
-    print ( "IoT Hub responded to message with status: %s" % (result) )
+            def iothub_client_init():
+                # Create an IoT Hub client
+                # client.set_option("auto_url_encode_decode", True)
+                client = IoTHubClient(CONNECTION_STRING, PROTOCOL)
+                return client
 
-def iothub_client_init():
-    # Create an IoT Hub client
-   # client.set_option("auto_url_encode_decode", True)
-    client = IoTHubClient(CONNECTION_STRING, PROTOCOL)
-    return client
+                def iothub_client_telemetry_sample_run():
 
-def iothub_client_telemetry_sample_run():
+                    try:
+                        client = iothub_client_init()
+                        print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
 
-    try:
-        client = iothub_client_init()
-        print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
-
-        while True:
+                        while True:
             # Build the message with real telemetry values.
             #temperature = TEMPERATURE
             #humidity = HUMIDITY
             #MSG_TXT_formatted = "{\"TEMPERATURE\": %.2f,\"HUMIDITY\": %.2f}"
             #msg_txt_formatted = MSG_TXT % ('temperature', 'humidity')
-            message = IoTHubMessage(MSG_TXT_formatted)
+                            message = IoTHubMessage(MSG_TXT_formatted)
 
             # Add a custom application property to the message.
             # An IoT hub can filter on these properties without access to the message body.
-            prop_map = message.properties()
-            if temperature > 30:
-              prop_map.add("temperatureAlert", "true")
-            else:
-              prop_map.add("temperatureAlert", "false")
+                        prop_map = message.properties()
+                        if temperature > 30:
+                            prop_map.add("temperatureAlert", "true")
+                        else:
+                            prop_map.add("temperatureAlert", "false")
 
             # Send the message.
-            print( "Sending message: %s" % message.get_string() )
-            client.send_event_async(message, send_confirmation_callback, None)
-            time.sleep(1)
+                        print( "Sending message: %s" % message.get_string() )
+                        client.send_event_async(message, send_confirmation_callback, None)
+                        time.sleep(1)
+                        break
+                        counter += 1
+                        tag.waitForNotifications(arg.t)
+# Define the JSON message to send to IoT Hub.
+#temperature = IRTemperatureSensor.read()
+#humidity = HumiditySensor.read()
+#temperature = tag.IRtemperature.read()
+#humidity = tag.humidity.read()
+#MSG_TXT = "{\"temperature\": temperature,\"humidity\": humidity}"
+#MSG_TXT_formatted = MSG_TXT
 
-            tag.disconnect()
-            del tag
 
 
-    except IoTHubError as iothub_error:
+                        tag.disconnect()
+                        del tag
+
+
+        except IoTHubError as iothub_error:
         print ( "Unexpected error %s from IoTHub" % iothub_error )
         return
     except KeyboardInterrupt:
