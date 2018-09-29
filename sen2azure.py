@@ -504,9 +504,13 @@ def iothub_client_telemetry_sample_run():
 
         while True:
             # Build the message with simulated telemetry values.
-            temperature = 'tAmb'
-            humidity = 'tag.humidity.read'
-            msg_txt_formatted = MSG_TXT % (tAmb, RH)
+            if arg.temperature or arg.all:
+           print('Temp: ', tag.IRtemperature.read())
+            if arg.humidity or arg.all:
+           print("Humidity: ", tag.humidity.read())
+            temperature = 'tag.IRtemperature.read()'
+            humidity = 'tag.humidity.read()'
+            msg_txt_formatted = MSG_TXT % (temperature, humidity)
             message = IoTHubMessage(msg_txt_formatted)
 
             # Add a custom application property to the message.
