@@ -82,7 +82,7 @@ class IRTemperatureSensor(SensorBase):
         '''Returns (ambient_temp) in degC'''
         # See http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#IR_Temperature_Sensor
         rawTamb = struct.unpack('<hh', self.data.read())
-        tAmb = rawTamb / 128.0
+        tAmb = (rawTamb / 128.0)
         return (tAmb)
 
 class IRTemperatureSensorTMP007(SensorBase):
