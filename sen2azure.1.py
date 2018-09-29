@@ -79,7 +79,7 @@ class IRTemperatureSensor(SensorBase):
         self.S0 = 6.4e-14
 
     def read(self):
-        '''Returns (ambient_temp, target_temp) in degC'''
+        '''Returns (ambient_temp) in degC'''
         # See http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#IR_Temperature_Sensor
         (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         tAmb = rawTamb / 128.0
@@ -91,7 +91,7 @@ class IRTemperatureSensor(SensorBase):
         fObj = calcPoly(self.Cpoly, Vobj-Vos)
 
         tObj = math.pow( math.pow(tDie,4.0) + (fObj/S), 0.25 )
-        return (tAmb, tObj - self.zeroC)
+        return (tAmb)
 
 class IRTemperatureSensorTMP007(SensorBase):
     svcUUID  = _TI_UUID(0xAA00)
@@ -182,11 +182,11 @@ class HumiditySensor(SensorBase):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (ambient_temp, rel_humidity)'''
+        '''Returns (rel_humidity)'''
         (rawT, rawH) = struct.unpack('<HH', self.data.read())
-        temp = -46.85 + 175.72 * (rawT / 65536.0)
+        #temp = -46.85 + 175.72 * (rawT / 65536.0)
         RH = -6.0 + 125.0 * ((rawH & 0xFFFC)/65536.0)
-        return (temp, RH)
+        return (RH)
 
 class HumiditySensorHDC1000(SensorBase):
     svcUUID  = _TI_UUID(0xAA20)
@@ -197,11 +197,11 @@ class HumiditySensorHDC1000(SensorBase):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (ambient_temp, rel_humidity)'''
+        '''Returns (rel_humidity)'''
         (rawT, rawH) = struct.unpack('<HH', self.data.read())
         temp = -40.0 + 165.0 * (rawT / 65536.0)
         RH = 100.0 * (rawH/65536.0)
-        return (temp, RH)
+        return (RH)
 
 class MagnetometerSensor(SensorBase):
     svcUUID  = _TI_UUID(0xAA30)
@@ -485,12 +485,13 @@ def main():
     while True:
        if arg.temperature or arg.all:
            print('Temp: ', tag.IRtemperature.read())
+           TEMPERATURE = tag.IRtemperature.read()
        if arg.humidity or arg.all:
            print("Humidity: ", tag.humidity.read())
-           TEMPERATURE = tag.IRtemperature.read()
            HUMIDITY = tag.humidity.read()
            # Define the JSON message to send to IoT Hub.
-           print ('temperature': TEMPERATURE, 'humidity': HUMIDITY)
+           print('temperature', TEMPERATURE)
+           print('humidity', HUMIDITY)
            MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
            def send_confirmation_callback(message, result, user_context):
             print ( "IoT Hub responded to message with status: %s" % (result) )
