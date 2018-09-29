@@ -1,6 +1,9 @@
 from bluepy.btle import UUID, Peripheral, DefaultDelegate, AssignedNumbers
 import struct
 import math
+import random
+import time
+import sys
 
 def _TI_UUID(val):
     return UUID("%08X-0451-4000-b000-000000000000" % (0xF0000000+val))
@@ -9,6 +12,24 @@ def _TI_UUID(val):
 AUTODETECT = "-"
 SENSORTAG_V1 = "v1"
 SENSORTAG_2650 = "CC2650"
+
+
+# Using the Python Device SDK for IoT Hub:
+#   https://github.com/Azure/azure-iot-sdk-python
+# The sample connects to a device-specific MQTT endpoint on your IoT Hub.
+import iothub_client
+# pylint: disable=E0611
+from iothub_client import IoTHubClient, IoTHubClientError, IoTHubTransportProvider, IoTHubClientResult
+from iothub_client import IoTHubMessage, IoTHubMessageDispositionResult, IoTHubError, DeviceMethodReturnValue
+
+# The device connection string to authenticate the device with your IoT hub.
+# Using the Azure CLI:
+# az iot hub device-identity show-connection-string --hub-name {YourIoTHubName} --device-id MyNodeDevice --output table
+CONNECTION_STRING = "HostName=fbhub001.azure-devices.net;DeviceId=CC2541-fb-Room2;SharedAccessKey=q8wg+U5a+oZaPxEMmuOr7xa8zTgILqhXMa8yiqdCgBY="
+
+# Using the MQTT protocol.
+PROTOCOL = IoTHubTransportProvider.MQTT
+MESSAGE_TIMEOUT = 10000
 
 class SensorBase:
     # Derived classes should set: svcUUID, ctrlUUID, dataUUID
@@ -489,34 +510,11 @@ def main():
            break
        counter += 1
        tag.waitForNotifications(arg.t)
-# Copyright (c) Microsoft. All rights reserved.
-# Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-import random
-import time
-import sys
-
-# Using the Python Device SDK for IoT Hub:
-#   https://github.com/Azure/azure-iot-sdk-python
-# The sample connects to a device-specific MQTT endpoint on your IoT Hub.
-import iothub_client
-# pylint: disable=E0611
-from iothub_client import IoTHubClient, IoTHubClientError, IoTHubTransportProvider, IoTHubClientResult
-from iothub_client import IoTHubMessage, IoTHubMessageDispositionResult, IoTHubError, DeviceMethodReturnValue
-
-# The device connection string to authenticate the device with your IoT hub.
-# Using the Azure CLI:
-# az iot hub device-identity show-connection-string --hub-name {YourIoTHubName} --device-id MyNodeDevice --output table
-CONNECTION_STRING = "HostName=fbhub001.azure-devices.net;DeviceId=CC2541-fb-Room2;SharedAccessKey=q8wg+U5a+oZaPxEMmuOr7xa8zTgILqhXMa8yiqdCgBY="
-
-# Using the MQTT protocol.
-PROTOCOL = IoTHubTransportProvider.MQTT
-MESSAGE_TIMEOUT = 10000
-
 # Define the JSON message to send to IoT Hub.
 TEMPERATURE = 'tag.IRtemperature.read()'
 HUMIDITY = 'tag.humidity.read()'
 MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
+MSG_TXT_formatted = MSG_TXT
 
 def send_confirmation_callback(message, result, user_context):
     print ( "IoT Hub responded to message with status: %s" % (result) )
@@ -537,7 +535,7 @@ def iothub_client_telemetry_sample_run():
             # Build the message with real telemetry values.
             temperature = TEMPERATURE
             humidity = HUMIDITY
-            MSG_TXT_formatted = "{\"deviceId\": \"temperature\": %.2f,\"humidity\": %.2f}"
+            #MSG_TXT_formatted = "{\"TEMPERATURE\": %.2f,\"HUMIDITY\": %.2f}"
             #msg_txt_formatted = MSG_TXT % ('temperature', 'humidity')
             message = IoTHubMessage(MSG_TXT_formatted)
 
@@ -561,7 +559,7 @@ def iothub_client_telemetry_sample_run():
         print ( "IoTHubClient sample stopped" )
 
 if __name__ == '__main__':
-    print ( "IoT Hub Quickstart #1 - Simulated device" )
+    print ( "IoT Hub Quickstart #1 - Real device" )
     print ( "Press Ctrl-C to exit" )
     iothub_client_telemetry_sample_run()
 
