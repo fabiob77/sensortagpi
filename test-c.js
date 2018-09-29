@@ -11,8 +11,17 @@ function sensorTagDisovered(sensorTag) {
 
 sensorTag.on('disconnect', function() {
     console.log('disconnected!');
-    process.exit(0);
-  });
+});
+sensorTag.connectAndSetUp(function(err) {
+  // restart discovery
+  SensorTag.discover(sensorTagDisovered);
+
+  if (err) {
+    console.log('error occurred on connect or set up!');
+    return;
+  }
+
+  console.log('connected');
 
   async.series([
       function(callback) {
@@ -294,6 +303,7 @@ sensorTag.on('disconnect', function() {
     ]
 //}
 );
+  }
 }
 // start discovery of a SensorTag
 SensorTag.discover(sensorTagDisovered);
