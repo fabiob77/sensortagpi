@@ -528,8 +528,8 @@ def main():
                 return
             except KeyboardInterrupt:
                 print ( "IoTHubClient sample stopped" )
-    counter += 1
-    tag.waitForNotifications(arg.t) 
+        counter += 1
+        tag.waitForNotifications(arg.t) 
           
       
     if __name__ == "__main__":
