@@ -537,8 +537,9 @@ def iothub_client_telemetry_sample_run():
             # Build the message with real telemetry values.
             temperature = TEMPERATURE
             humidity = HUMIDITY
-            msg_txt_formatted = MSG_TXT % ('temperature', 'humidity')
-            message = IoTHubMessage(msg_txt_formatted)
+            MSG_TXT_formatted = "{\"deviceId\": \"temperature\": %.2f,\"humidity\": %.2f}"
+            #msg_txt_formatted = MSG_TXT % ('temperature', 'humidity')
+            message = IoTHubMessage(MSG_TXT_formatted)
 
             # Add a custom application property to the message.
             # An IoT hub can filter on these properties without access to the message body.
