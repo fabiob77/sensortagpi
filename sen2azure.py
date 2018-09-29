@@ -510,9 +510,6 @@ def main():
        counter += 1
        tag.waitForNotifications(arg.t)
        
-    tag.disconnect()
-    del tag
-
     # Define the JSON message to send to IoT Hub.
 temperature = "tag.IRtemperature.read()"
 humidity = "tag.humidity.read()"
@@ -554,6 +551,8 @@ def iothub_client_telemetry_sample_run():
             print( "Sending message: %s" % message.get_string() )
             client.send_event_async(message, send_confirmation_callback, None)
             time.sleep(1)
+            tag.disconnect()
+            del tag
 
 
     except IoTHubError as iothub_error:
