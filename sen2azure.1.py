@@ -490,6 +490,7 @@ def main():
            TEMPERATURE = tag.IRtemperature.read()
            HUMIDITY = tag.humidity.read()
            # Define the JSON message to send to IoT Hub.
+           print (MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}")
            MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
            def send_confirmation_callback(message, result, user_context):
             print ( "IoT Hub responded to message with status: %s" % (result) )
