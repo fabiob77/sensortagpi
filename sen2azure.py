@@ -491,10 +491,8 @@ def main():
     while True:
        if arg.temperature or arg.all:
            print('Temp: ', tag.IRtemperature.read())
-           temperature = (tag.IRtemperature.read())
        if arg.humidity or arg.all:
            print("Humidity: ", tag.humidity.read())
-           humidity = (tag.humidity.read())
        if arg.barometer or arg.all:
            print("Barometer: ", tag.barometer.read())
        if arg.accelerometer or arg.all:
@@ -513,6 +511,11 @@ def main():
         # Define the JSON message to send to IoT Hub.
 #temperature = IRTemperatureSensor.read()
 #humidity = HumiditySensor.read()
+while True:
+       if arg.temperature or arg.all:
+            temperature = (tag.IRtemperature.read())
+       if arg.humidity or arg.all:
+            humidity = (tag.humidity.read())
 MSG_TXT = "{\"temperature\": temperature,\"humidity\": humidity}"
 MSG_TXT_formatted = MSG_TXT
 
