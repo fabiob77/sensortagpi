@@ -538,10 +538,10 @@ def main():
        tag.waitForNotifications(arg.t)       
        if __name__ == "__main__":
             main()
-if __name__ == '__main__':
-    print ( "IoT Hub Quickstart #1 - R device" )
-    print ( "Press Ctrl-C to exit" )
-    iothub_client_telemetry_sample_run()
+            if __name__ == '__main__':
+              print ( "IoT Hub Quickstart #1 - R device" )
+              print ( "Press Ctrl-C to exit" )
+              iothub_client_telemetry_sample_run()
         
     tag.disconnect()
     del tag
