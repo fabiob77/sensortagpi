@@ -488,32 +488,7 @@ def main():
     # Not waiting here after enabling a sensor, the first read value might be empty or incorrect.
     time.sleep(1.0)
 
-    counter=1
-    while True:
-       if arg.temperature or arg.all:
-           print('Temp: ', tag.IRtemperature.read())
-       if arg.humidity or arg.all:
-           print("Humidity: ", tag.humidity.read())
-       if arg.barometer or arg.all:
-           print("Barometer: ", tag.barometer.read())
-       if arg.accelerometer or arg.all:
-           print("Accelerometer: ", tag.accelerometer.read())
-       if arg.magnetometer or arg.all:
-           print("Magnetometer: ", tag.magnetometer.read())
-       if arg.gyroscope or arg.all:
-           print("Gyroscope: ", tag.gyroscope.read())
-       if (arg.light or arg.all) and tag.lightmeter is not None:
-           print("Light: ", tag.lightmeter.read())
-       if arg.battery or arg.all:
-           print("Battery: ", tag.battery.read())
-       if counter >= arg.count and arg.count != 0:
-           break
-       counter += 1
-       tag.waitForNotifications(arg.t)
-       
-    tag.disconnect()
-    del tag
-# Define the JSON message to send to IoT Hub.
+    # Define the JSON message to send to IoT Hub.
 temperature = "tag.IRtemperature.read()"
 humidity = "tag.humidity.read()"
 MSG_TXT = "{\"temperature\": tag.IRtemperature.read(),\"humidity\": tag.humidity.read()}"
@@ -561,10 +536,31 @@ def iothub_client_telemetry_sample_run():
     except KeyboardInterrupt:
         print ( "IoTHubClient sample stopped" )
 
-if __name__ == '__main__':
-    print ( "IoT Hub Quickstart #1 - Real device" )
-    print ( "Press Ctrl-C to exit" )
-    iothub_client_telemetry_sample_run()
+    counter=1
+    while True:
+       if arg.temperature or arg.all:
+           print('Temp: ', tag.IRtemperature.read())
+       if arg.humidity or arg.all:
+           print("Humidity: ", tag.humidity.read())
+       if arg.barometer or arg.all:
+           print("Barometer: ", tag.barometer.read())
+       if arg.accelerometer or arg.all:
+           print("Accelerometer: ", tag.accelerometer.read())
+       if arg.magnetometer or arg.all:
+           print("Magnetometer: ", tag.magnetometer.read())
+       if arg.gyroscope or arg.all:
+           print("Gyroscope: ", tag.gyroscope.read())
+       if (arg.light or arg.all) and tag.lightmeter is not None:
+           print("Light: ", tag.lightmeter.read())
+       if arg.battery or arg.all:
+           print("Battery: ", tag.battery.read())
+       if counter >= arg.count and arg.count != 0:
+           break
+       counter += 1
+       tag.waitForNotifications(arg.t)
+       
+    tag.disconnect()
+    del tag
 
 if __name__ == "__main__":
     main()
