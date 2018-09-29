@@ -489,16 +489,13 @@ def main():
        if arg.humidity or arg.all:
            print("Humidity: ", tag.humidity.read())
            HUMIDITY = tag.humidity.read()
-           
+           # Define the JSON message to send to IoT Hub.
+           MSG_TXT = "{\"temperature\": 'TEMPERATURE',\"humidity\": 'HUMIDITY'}"
+           def send_confirmation_callback(message, result, user_context):
+            print ( "IoT Hub responded to message with status: %s" % (result) )
        if counter >= arg.count and arg.count != 0:
            break
-       counter += 1
-       tag.waitForNotifications(arg.t) 
-           # Define the JSON message to send to IoT Hub.
-           #MSG_TXT = "{\"temperature\": 'TEMPERATURE',\"humidity\": 'HUMIDITY'}"
-           #def send_confirmation_callback(message, result, user_context):
-           # print ( "IoT Hub responded to message with status: %s" % (result) )
-           
+         
     def iothub_client_init():
             # Create an IoT Hub client
             # client.set_option("auto_url_encode_decode", True)
@@ -531,6 +528,9 @@ def main():
                 return
             except KeyboardInterrupt:
                 print ( "IoTHubClient sample stopped" )
+    counter += 1
+    tag.waitForNotifications(arg.t) 
+          
       
     if __name__ == "__main__":
             main()
