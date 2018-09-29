@@ -511,8 +511,8 @@ def main():
        counter += 1
        tag.waitForNotifications(arg.t)
 # Define the JSON message to send to IoT Hub.
-TEMPERATURE = tag.IRtemperature.read()
-HUMIDITY = tag.humidity.read()
+TEMPERATURE = (tag.IRtemperature.read())
+HUMIDITY = (tag.humidity.read())
 MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
 MSG_TXT_formatted = MSG_TXT
 
