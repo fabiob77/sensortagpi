@@ -1,26 +1,6 @@
 from bluepy.btle import UUID, Peripheral, DefaultDelegate, AssignedNumbers
 import struct
 import math
-import random
-import time
-import sys
-
-# Using the Python Device SDK for IoT Hub:
-#   https://github.com/Azure/azure-iot-sdk-python
-# The sample connects to a device-specific MQTT endpoint on your IoT Hub.
-import iothub_client
-# pylint: disable=E0611
-from iothub_client import IoTHubClient, IoTHubClientError, IoTHubTransportProvider, IoTHubClientResult
-from iothub_client import IoTHubMessage, IoTHubMessageDispositionResult, IoTHubError, DeviceMethodReturnValue
-
-# The device connection string to authenticate the device with your IoT hub.
-# Using the Azure CLI:
-# az iot hub device-identity show-connection-string --hub-name {YourIoTHubName} --device-id MyNodeDevice --output table
-CONNECTION_STRING = "HostName=fbhub001.azure-devices.net;DeviceId=CC2541-fb-Room2;SharedAccessKey=q8wg+U5a+oZaPxEMmuOr7xa8zTgILqhXMa8yiqdCgBY="
-
-# Using the MQTT protocol.
-PROTOCOL = IoTHubTransportProvider.MQTT
-MESSAGE_TIMEOUT = 10000
 
 def _TI_UUID(val):
     return UUID("%08X-0451-4000-b000-000000000000" % (0xF0000000+val))
@@ -79,7 +59,7 @@ class IRTemperatureSensor(SensorBase):
         self.S0 = 6.4e-14
 
     def read(self):
-        '''Returns (ambient_temp) in degC'''
+        '''Returns (ambient_temp, target_temp) in degC'''
         # See http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#IR_Temperature_Sensor
         (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         tAmb = rawTamb / 128.0
@@ -89,7 +69,9 @@ class IRTemperatureSensor(SensorBase):
         S   = self.S0 * calcPoly(self.Apoly, tDie-self.tRef)
         Vos = calcPoly(self.Bpoly, tDie-self.tRef)
         fObj = calcPoly(self.Cpoly, Vobj-Vos)
-        return (tAmb)
+
+        tObj = math.pow( math.pow(tDie,4.0) + (fObj/S), 0.25 )
+        return (tAmb, tObj - self.zeroC)
 
 
 class IRTemperatureSensorTMP007(SensorBase):
@@ -103,12 +85,12 @@ class IRTemperatureSensorTMP007(SensorBase):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (ambient_temp) in degC'''
+        '''Returns (ambient_temp, target_temp) in degC'''
         # http://processors.wiki.ti.com/index.php/CC2650_SensorTag_User's_Guide?keyMatch=CC2650&tisearch=Search-EN
         (rawTobj, rawTamb) = struct.unpack('<hh', self.data.read())
         tObj = (rawTobj >> 2) * self.SCALE_LSB;
         tAmb = (rawTamb >> 2) * self.SCALE_LSB;
-        return (tAmb)
+        return (tAmb, tObj)
 
 class AccelerometerSensor(SensorBase):
     svcUUID  = _TI_UUID(0xAA10)
@@ -481,12 +463,61 @@ def main():
     if (arg.light or arg.all) and tag.lightmeter is not None:
         tag.lightmeter.enable()
 
+    # Some sensors (e.g., temperature, accelerometer) need some time for initialization.
+    # Not waiting here after enabling a sensor, the first read value might be empty or incorrect.
+    time.sleep(1.0)
+
+    counter=1
+    while True:
+       if arg.temperature or arg.all:
+           print('Temp: ', tag.IRtemperature.read())
+       if arg.humidity or arg.all:
+           print("Humidity: ", tag.humidity.read())
+       if arg.barometer or arg.all:
+           print("Barometer: ", tag.barometer.read())
+       if arg.accelerometer or arg.all:
+           print("Accelerometer: ", tag.accelerometer.read())
+       if arg.magnetometer or arg.all:
+           print("Magnetometer: ", tag.magnetometer.read())
+       if arg.gyroscope or arg.all:
+           print("Gyroscope: ", tag.gyroscope.read())
+       if (arg.light or arg.all) and tag.lightmeter is not None:
+           print("Light: ", tag.lightmeter.read())
+       if arg.battery or arg.all:
+           print("Battery: ", tag.battery.read())
+       if counter >= arg.count and arg.count != 0:
+           break
+       counter += 1
+       tag.waitForNotifications(arg.t)
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+import random
+import time
+import sys
+
+# Using the Python Device SDK for IoT Hub:
+#   https://github.com/Azure/azure-iot-sdk-python
+# The sample connects to a device-specific MQTT endpoint on your IoT Hub.
+import iothub_client
+# pylint: disable=E0611
+from iothub_client import IoTHubClient, IoTHubClientError, IoTHubTransportProvider, IoTHubClientResult
+from iothub_client import IoTHubMessage, IoTHubMessageDispositionResult, IoTHubError, DeviceMethodReturnValue
+
+# The device connection string to authenticate the device with your IoT hub.
+# Using the Azure CLI:
+# az iot hub device-identity show-connection-string --hub-name {YourIoTHubName} --device-id MyNodeDevice --output table
+CONNECTION_STRING = "HostName=fbhub001.azure-devices.net;DeviceId=CC2541-fb-Room2;SharedAccessKey=q8wg+U5a+oZaPxEMmuOr7xa8zTgILqhXMa8yiqdCgBY="
+
+# Using the MQTT protocol.
+PROTOCOL = IoTHubTransportProvider.MQTT
+MESSAGE_TIMEOUT = 10000
+
 # Define the JSON message to send to IoT Hub.
-    if arg.temperature or arg.all:
-           TEMPERATURE =  tag.IRtemperature.read()
-    if arg.humidity or arg.all:
-           HUMIDITY = tag.humidity.read()
+TEMPERATURE = 'tag.IRtemperature.read()'
+HUMIDITY = 'tag.humidity.read()'
 MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
+
 def send_confirmation_callback(message, result, user_context):
     print ( "IoT Hub responded to message with status: %s" % (result) )
 
@@ -504,12 +535,8 @@ def iothub_client_telemetry_sample_run():
 
         while True:
             # Build the message with simulated telemetry values.
-            if arg.temperature or arg.all:
-           print('Temp: ', tag.IRtemperature.read())
-            if arg.humidity or arg.all:
-           print("Humidity: ", tag.humidity.read())
-            temperature = 'tag.IRtemperature.read()'
-            humidity = 'tag.humidity.read()'
+            temperature = TEMPERATURE
+            humidity = HUMIDITY
             msg_txt_formatted = MSG_TXT % (temperature, humidity)
             message = IoTHubMessage(msg_txt_formatted)
 
@@ -536,32 +563,6 @@ if __name__ == '__main__':
     print ( "IoT Hub Quickstart #1 - Simulated device" )
     print ( "Press Ctrl-C to exit" )
     iothub_client_telemetry_sample_run()
-
-    # Some sensors (e.g., temperature, accelerometer) need some time for initialization.
-    # Not waiting here after enabling a sensor, the first read value might be empty or incorrect.
-    time.sleep(1.0)
-    counter=1
-    while True:
-       if arg.temperature or arg.all:
-           print('Temp: ', tag.IRtemperature.read())
-       if arg.humidity or arg.all:
-           print("Humidity: ", tag.humidity.read())
-       if arg.barometer or arg.all:
-           print("Barometer: ", tag.barometer.read())
-       if arg.accelerometer or arg.all:
-           print("Accelerometer: ", tag.accelerometer.read())
-       if arg.magnetometer or arg.all:
-           print("Magnetometer: ", tag.magnetometer.read())
-       if arg.gyroscope or arg.all:
-           print("Gyroscope: ", tag.gyroscope.read())
-       if (arg.light or arg.all) and tag.lightmeter is not None:
-           print("Light: ", tag.lightmeter.read())
-       if arg.battery or arg.all:
-           print("Battery: ", tag.battery.read())
-       if counter >= arg.count and arg.count != 0:
-           break
-       counter += 1
-       tag.waitForNotifications(arg.t)
 
     tag.disconnect()
     del tag
