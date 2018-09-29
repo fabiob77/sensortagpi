@@ -79,11 +79,19 @@ class IRTemperatureSensor(SensorBase):
         self.S0 = 6.4e-14
 
     def read(self):
-        '''Returns (ambient_temp) in degC'''
+        '''Returns (ambient_temp, target_temp) in degC'''
         # See http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#IR_Temperature_Sensor
-        rawTamb = struct.unpack('<hh', self.data.read())
-        tAmb = (rawTamb[0] / 128.0)
-        return (tAmb)
+        (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
+        tAmb = rawTamb / 128.0
+        Vobj = 1.5625e-7 * rawVobj
+
+        tDie = tAmb + self.zeroC
+        S   = self.S0 * calcPoly(self.Apoly, tDie-self.tRef)
+        Vos = calcPoly(self.Bpoly, tDie-self.tRef)
+        fObj = calcPoly(self.Cpoly, Vobj-Vos)
+
+        tObj = math.pow( math.pow(tDie,4.0) + (fObj/S), 0.25 )
+        return (tAmb, tObj - self.zeroC)
 
 class IRTemperatureSensorTMP007(SensorBase):
     svcUUID  = _TI_UUID(0xAA00)
