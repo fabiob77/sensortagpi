@@ -125,7 +125,7 @@ while True:
                         print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
 
                         while True:
-                            # Build the message with simulated telemetry values.
+                            # Build the message with real telemetry values.
                             temperature = temp
                             humidity = hum
                             msg_txt_formatted = MSG_TXT % (temperature, humidity)
@@ -152,7 +152,7 @@ while True:
                         print ( "IoTHubClient sample stopped" )
 
                 if __name__ == '__main__':
-                    print ( "IoT Hub Quickstart #1 - Simulated device" )
+                    print ( "IoT Hub Quickstart #1 - real device" )
                     print ( "Press Ctrl-C to exit" )
                     iothub_client_telemetry_sample_run()
                 
