@@ -6,7 +6,6 @@ function sensorTagDisovered(sensorTag) {
   sensorTag.once('disconnect', function() {
     console.log('disconnected');
   });
-
   sensorTag.connectAndSetUp(function(err) {
     // restart discovery
     SensorTag.discover(sensorTagDisovered);
