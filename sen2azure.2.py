@@ -83,7 +83,7 @@ class IRTemperatureSensor(SensorBase):
         # See http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#IR_Temperature_Sensor
         (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         temp1 = (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
-        temp2 = temp1[index]
+        print(temp1[1])
         tAmb = rawTamb / 128.0
         Vobj = 1.5625e-7 * rawVobj
         #policy_id = ((rawVobj,), (rawTamb))
@@ -506,7 +506,7 @@ def main():
        counter += 1
        tag.waitForNotifications(arg.t)
        tag.disconnect()
-       temperature = temp2
+       temperature = temp1
        humidity = tag.humidity.read()
        del tag
        # Define the JSON message to send to IoT Hub.
