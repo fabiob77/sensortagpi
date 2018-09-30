@@ -501,8 +501,8 @@ def main():
     counter=1
     while True:
        if arg.temperature or arg.all:
-           #print('Temp: ', tag.IRtemperature.read())
-           print('Temp: ', temp2amb)
+           print('Temp: ', tag.IRtemperature.read())
+           #print('Temp: ', temp2amb)
        if arg.humidity or arg.all:
            print("Humidity: ", tag.humidity.read())
        if arg.barometer or arg.all:
