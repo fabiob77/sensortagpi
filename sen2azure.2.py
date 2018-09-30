@@ -195,9 +195,8 @@ class HumiditySensor(SensorBase):
     def read(self):
         '''Returns (rel_humidity)'''
         global hum1
-        (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
-        hum1 = (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         (rawT, rawH) = struct.unpack('<HH', self.data.read())
+        hum1 = (rawT, rawH) = struct.unpack('<HH', self.data.read())
         print(hum1[1])
         temp = -46.85 + 175.72 * (rawT / 65536.0)
         RH = -6.0 + 125.0 * ((rawH & 0xFFFC)/65536.0)
