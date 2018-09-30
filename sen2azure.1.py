@@ -79,7 +79,7 @@ class IRTemperatureSensor(SensorBase):
         self.S0 = 6.4e-14
 
     def read(self):
-        '''Returns (ambient_temp, target_temp) in degC'''
+        '''Returns (ambient_temp) in degC'''
         # See http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#IR_Temperature_Sensor
         (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         tAmb = rawTamb / 128.0
@@ -91,7 +91,7 @@ class IRTemperatureSensor(SensorBase):
         fObj = calcPoly(self.Cpoly, Vobj-Vos)
 
         tObj = math.pow( math.pow(tDie,4.0) + (fObj/S), 0.25 )
-        return (tAmb, tObj - self.zeroC)
+        return (tAmb)
 
 
 class IRTemperatureSensorTMP007(SensorBase):
@@ -105,12 +105,12 @@ class IRTemperatureSensorTMP007(SensorBase):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (ambient_temp, target_temp) in degC'''
+        '''Returns (ambient_temp) in degC'''
         # http://processors.wiki.ti.com/index.php/CC2650_SensorTag_User's_Guide?keyMatch=CC2650&tisearch=Search-EN
         (rawTobj, rawTamb) = struct.unpack('<hh', self.data.read())
         tObj = (rawTobj >> 2) * self.SCALE_LSB;
         tAmb = (rawTamb >> 2) * self.SCALE_LSB;
-        return (tAmb, tObj)
+        return (tAmb)
 
 class AccelerometerSensor(SensorBase):
     svcUUID  = _TI_UUID(0xAA10)
@@ -187,11 +187,11 @@ class HumiditySensor(SensorBase):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (ambient_temp, rel_humidity)'''
+        '''Returns (rel_humidity)'''
         (rawT, rawH) = struct.unpack('<HH', self.data.read())
         temp = -46.85 + 175.72 * (rawT / 65536.0)
         RH = -6.0 + 125.0 * ((rawH & 0xFFFC)/65536.0)
-        return (temp, RH)
+        return (RH)
 
 class HumiditySensorHDC1000(SensorBase):
     svcUUID  = _TI_UUID(0xAA20)
@@ -202,11 +202,11 @@ class HumiditySensorHDC1000(SensorBase):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (ambient_temp, rel_humidity)'''
+        '''Returns (rel_humidity)'''
         (rawT, rawH) = struct.unpack('<HH', self.data.read())
         temp = -40.0 + 165.0 * (rawT / 65536.0)
         RH = 100.0 * (rawH/65536.0)
-        return (temp, RH)
+        return (RH)
 
 class MagnetometerSensor(SensorBase):
     svcUUID  = _TI_UUID(0xAA30)
