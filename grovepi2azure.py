@@ -106,6 +106,10 @@ while True:
                 # print "(",bgList[0],",",bgList[1],",",bgList[2],")"   # this was to test and debug color value list
                 setRGB(bgList[0],bgList[1],bgList[2])   # parse our list into the color settings
                 setText("Temp:" + t + "C      " + "Humidity :" + h + "%") # update the RGB LCD display
+
+               
+    except (IOError,TypeError) as e:
+        print("Error" + str(e))
                 # Define the JSON message to send to IoT Hub.
                 TEMPERATURE = temp
                 HUMIDITY = hum
@@ -157,6 +161,4 @@ while True:
                     print ( "Press Ctrl-C to exit" )
                     iothub_client_telemetry_sample_run()
 
-    except (IOError,TypeError) as e:
-        print("Error" + str(e))
 
