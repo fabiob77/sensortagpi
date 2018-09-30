@@ -81,9 +81,13 @@ class IRTemperatureSensor(SensorBase):
     def read(self):
         '''Returns (ambient_temp) in degC'''
         # See http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#IR_Temperature_Sensor
-        rawTamb = struct.unpack('<hh', self.data.read())
-        tAmb = (rawTamb / 128.0)
+        (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
+        tAmb = rawTamb / 128.0
         Vobj = 1.5625e-7 * rawVobj
+        #policy_id = ((rawVobj,), (rawTamb))
+        #for i in policy_id:
+        #tempAmb = print i[1]
+
 
         tDie = tAmb + self.zeroC
         S   = self.S0 * calcPoly(self.Apoly, tDie-self.tRef)
@@ -107,7 +111,7 @@ class IRTemperatureSensorTMP007(SensorBase):
     def read(self):
         '''Returns (ambient_temp) in degC'''
         # http://processors.wiki.ti.com/index.php/CC2650_SensorTag_User's_Guide?keyMatch=CC2650&tisearch=Search-EN
-        rawTamb = struct.unpack('<hh', self.data.read())
+        (rawTobj, rawTamb) = struct.unpack('<hh', self.data.read())
         tObj = (rawTobj >> 2) * self.SCALE_LSB;
         tAmb = (rawTamb >> 2) * self.SCALE_LSB;
         return (tAmb)
