@@ -4,6 +4,7 @@ import math
 import random
 import time
 import sys
+global temp1
 
 # Using the Python Device SDK for IoT Hub:
 #   https://github.com/Azure/azure-iot-sdk-python
