@@ -24,8 +24,7 @@ from iothub_client import IoTHubMessage, IoTHubMessageDispositionResult, IoTHubE
 CONNECTION_STRING = "HostName=fbhub001.azure-devices.net;DeviceId=CC2541-fb-Room2;SharedAccessKey=q8wg+U5a+oZaPxEMmuOr7xa8zTgILqhXMa8yiqdCgBY="
 
 # Using the MQTT protocol.
-#PROTOCOL = IoTHubTransportProvider.MQTT
-PROTOCOL = IoTHubTransportProvider.AMQP
+PROTOCOL = IoTHubTransportProvider.MQTT
 MESSAGE_TIMEOUT = 10000
 
 dht_sensor_port = 7     # Connect the DHt sensor to port 7
@@ -104,11 +103,12 @@ while True:
                 # print "(",bgList[0],",",bgList[1],",",bgList[2],")"   # this was to test and debug color value list
                 setRGB(bgList[0],bgList[1],bgList[2])   # parse our list into the color settings
                 setText("Temp:" + t + "C      " + "Humidity :" + h + "%") # update the RGB LCD display
+                
                 # Define the JSON message to send to IoT Hub.
                 TEMPERATURE = temp
                 HUMIDITY = hum
                 #MSG_TXT = "{\"temperature\": 'temp' ,\"humidity\": 'hum'}"
-                msg_txt = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
+                MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
                 def send_confirmation_callback(message, result, user_context):
                     print ( "IoT Hub responded to message with status: %s" % (result) )
 
@@ -128,7 +128,7 @@ while True:
                             # Build the message with simulated telemetry values.
                             temperature = temp
                             humidity = hum
-                            msg_txt_formatted = (temperature, humidity)
+                            msg_txt_formatted = MSG_TXT % (temperature, humidity)
                             message = IoTHubMessage(msg_txt_formatted)
                             print("JSON payload = " + msg_txt_formatted)
 
