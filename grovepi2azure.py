@@ -62,12 +62,12 @@ while True:
     try:
         temp = 0.01
         hum = 0.01
-        [ temp,hum ] = dht(dht_sensor_port,1)       #Get the temperature and Humidity from the DHT sensor
+        [ temp,hum ] = dht(dht_sensor_port,0)       #Get the temperature and Humidity from the DHT sensor
                                                     #Change the second parameter to 0 when using DHT (instead of DHT Pro)
                                                     #You will get very large number values if you don't!
         if (CtoF(temp) != lastTemp) and (hum != lastHum) and not math.isnan(temp) and not math.isnan(hum):
-                print("lowC : ",FtoC(tooLow),"C\t\t","rightC  : ", FtoC(justRight),"C\t\t","highC : ",FtoC(tooHigh),"C") # comment these three lines
-                print("lowF : ",tooLow,"F\t\tjustRight : ",justRight,"F\t\ttoHigh : ",tooHigh,"F")                       # if no monitor display
+                #print("lowC : ",FtoC(tooLow),"C\t\t","rightC  : ", FtoC(justRight),"C\t\t","highC : ",FtoC(tooHigh),"C") # comment these three lines
+                #print("lowF : ",tooLow,"F\t\tjustRight : ",justRight,"F\t\ttoHigh : ",tooHigh,"F")                       # if no monitor display
                 print("tempC : ", temp, "C\t\ttempF : ",CtoF(temp),"F\t\tHumidity =", hum,"%\r\n")
                 
                 lastHum = hum          # save temp & humidity values so that there is no update to the RGB LCD
@@ -85,4 +85,3 @@ while True:
                 setText("Temp:" + t + "C      " + "Humidity :" + h + "%") # update the RGB LCD display
                 
     except (IOError,TypeError) as e:
-        print("Error" + str(e))
