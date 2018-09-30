@@ -106,7 +106,7 @@ while True:
                 # Define the JSON message to send to IoT Hub.
                 TEMPERATURE = temp
                 HUMIDITY = hum
-                MSG_TXT = "{\"temperature\": TEMPERATURE,\"humidity\": HUMIDITY}"
+                MSG_TXT = "{\"temperature\": 'temp' ,\"humidity\": 'hum'}"
                 print  (MSG_TXT)
                 def send_confirmation_callback(message, result, user_context):
                     print ( "IoT Hub responded to message with status: %s" % (result) )
