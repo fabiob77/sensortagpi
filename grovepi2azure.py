@@ -106,59 +106,58 @@ while True:
                 # print "(",bgList[0],",",bgList[1],",",bgList[2],")"   # this was to test and debug color value list
                 setRGB(bgList[0],bgList[1],bgList[2])   # parse our list into the color settings
                 setText("Temp:" + t + "C      " + "Humidity :" + h + "%") # update the RGB LCD display
-
-               
-    except (IOError,TypeError) as e:
-        print("Error" + str(e))
-                # Define the JSON message to send to IoT Hub.
                 TEMPERATURE = temp
                 HUMIDITY = hum
-                MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
+                 # Define the JSON message to send to IoT Hub.
+                MSG_TXT = "{\"temperature\": TEMPERATURE,\"humidity\": HUMIDIT}"
+    except (IOError,TypeError) as e:
+        print("Error" + str(e))
+               
 
-                def send_confirmation_callback(message, result, user_context):
-                    print ( "IoT Hub responded to message with status: %s" % (result) )
+             #   def send_confirmation_callback(message, result, user_context):
+            #        print ( "IoT Hub responded to message with status: %s" % (result) )
 
-                def iothub_client_init():
-                    # Create an IoT Hub client
+            #    def iothub_client_init():
+                # Create an IoT Hub client
                     # client.set_option("auto_url_encode_decode", True)
-                    client = IoTHubClient(CONNECTION_STRING, PROTOCOL)
-                    return client
+        #            client = IoTHubClient(CONNECTION_STRING, PROTOCOL)
+         #           return client
 
-                def iothub_client_telemetry_sample_run():
+          #      def iothub_client_telemetry_sample_run():
 
-                    try:
-                        client = iothub_client_init()
-                        print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
+           #         try:
+            #            client = iothub_client_init()
+             #           print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
 
-                        while True:
+              #          while True:
                             # Build the message with real telemetry values.
-                            temperature = TEMPERATURE
-                            humidity = HUMIDITY
-                            msg_txt_formatted = MSG_TXT % (temperature, humidity)
-                            message = IoTHubMessage(msg_txt_formatted)
+               #             temperature = TEMPERATURE
+                #            humidity = HUMIDITY
+                 #           msg_txt_formatted = MSG_TXT % (temperature, humidity)
+                  #          message = IoTHubMessage(msg_txt_formatted)
 
-                            # Add a custom application property to the message.
-                            # An IoT hub can filter on these properties without access to the message body.
-                            prop_map = message.properties()
-                            if temperature > 30:
-                                prop_map.add("temperatureAlert", "true")
-                            else:
-                                prop_map.add("temperatureAlert", "false")
+                   #         # Add a custom application property to the message.
+                    #        # An IoT hub can filter on these properties without access to the message body.
+                     #       prop_map = message.properties()
+                      #      if temperature > 30:
+                       #         prop_map.add("temperatureAlert", "true")
+                        #    else:
+                         #       prop_map.add("temperatureAlert", "false")
 
                             # Send the message.
-                            print( "Sending message: %s" % message.get_string() )
-                            client.send_event_async(message, send_confirmation_callback, None)
-                            time.sleep(1)
+            #                print( "Sending message: %s" % message.get_string() )
+            #                client.send_event_async(message, send_confirmation_callback, None)
+             #               time.sleep(1)
 
-                    except IoTHubError as iothub_error:
-                        print ( "Unexpected error %s from IoTHub" % iothub_error )
-                        return
-                    except KeyboardInterrupt:
-                        print ( "IoTHubClient  stopped" )
+             #       except IoTHubError as iothub_error:
+             #           print ( "Unexpected error %s from IoTHub" % iothub_error )
+             #           return
+             #       except KeyboardInterrupt:
+             #           print ( "IoTHubClient  stopped" )
 
-                if __name__ == '__main__':
-                    print ( "IoT Hub - Real device" )
-                    print ( "Press Ctrl-C to exit" )
-                    iothub_client_telemetry_sample_run()
+          #      if __name__ == '__main__':
+          #          print ( "IoT Hub - Real device" )
+          #          print ( "Press Ctrl-C to exit" )
+          #          iothub_client_telemetry_sample_run()
 
 
