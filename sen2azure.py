@@ -79,7 +79,7 @@ class IRTemperatureSensor(SensorBase):
         self.S0 = 6.4e-14
 
     def read(self):
-        '''Returns (ambient_temp) in degC'''
+        '''Returns (ambient_temp, target_temp) in degC'''
         # See http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#IR_Temperature_Sensor
         (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         tAmb = rawTamb / 128.0
@@ -91,24 +91,26 @@ class IRTemperatureSensor(SensorBase):
         fObj = calcPoly(self.Cpoly, Vobj-Vos)
 
         tObj = math.pow( math.pow(tDie,4.0) + (fObj/S), 0.25 )
-        return (tAmb)
+        return (tAmb, tObj - self.zeroC)
+
 
 class IRTemperatureSensorTMP007(SensorBase):
     svcUUID  = _TI_UUID(0xAA00)
     dataUUID = _TI_UUID(0xAA01)
     ctrlUUID = _TI_UUID(0xAA02)
 
-    SCALE_LSB = 0.03125
+    SCALE_LSB = 0.03125;
  
     def __init__(self, periph):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (ambient_temp) in degC'''
+        '''Returns (ambient_temp, target_temp) in degC'''
         # http://processors.wiki.ti.com/index.php/CC2650_SensorTag_User's_Guide?keyMatch=CC2650&tisearch=Search-EN
-        rawTamb = struct.unpack('<hh', self.data.read())
-        tAmb = (rawTamb >> 2) * self.SCALE_LSB
-        return (tAmb)
+        (rawTobj, rawTamb) = struct.unpack('<hh', self.data.read())
+        tObj = (rawTobj >> 2) * self.SCALE_LSB;
+        tAmb = (rawTamb >> 2) * self.SCALE_LSB;
+        return (tAmb, tObj)
 
 class AccelerometerSensor(SensorBase):
     svcUUID  = _TI_UUID(0xAA10)
@@ -173,6 +175,9 @@ class AccelerometerSensorMPU9250:
         '''Returns (x_accel, y_accel, z_accel) in units of g'''
         rawVals = self.sensor.rawRead()[3:6]
         return tuple([ v*self.scale for v in rawVals ])
+
+
+
 class HumiditySensor(SensorBase):
     svcUUID  = _TI_UUID(0xAA20)
     dataUUID = _TI_UUID(0xAA21)
@@ -182,11 +187,11 @@ class HumiditySensor(SensorBase):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (rel_humidity)'''
+        '''Returns (ambient_temp, rel_humidity)'''
         (rawT, rawH) = struct.unpack('<HH', self.data.read())
-        #temp = -46.85 + 175.72 * (rawT / 65536.0)
+        temp = -46.85 + 175.72 * (rawT / 65536.0)
         RH = -6.0 + 125.0 * ((rawH & 0xFFFC)/65536.0)
-        return (RH)
+        return (temp, RH)
 
 class HumiditySensorHDC1000(SensorBase):
     svcUUID  = _TI_UUID(0xAA20)
@@ -197,11 +202,11 @@ class HumiditySensorHDC1000(SensorBase):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (rel_humidity)'''
+        '''Returns (ambient_temp, rel_humidity)'''
         (rawT, rawH) = struct.unpack('<HH', self.data.read())
         temp = -40.0 + 165.0 * (rawT / 65536.0)
         RH = 100.0 * (rawH/65536.0)
-        return (RH)
+        return (temp, RH)
 
 class MagnetometerSensor(SensorBase):
     svcUUID  = _TI_UUID(0xAA30)
@@ -339,8 +344,8 @@ class OpticalSensorOPT3001(SensorBase):
     def read(self):
         '''Returns value in lux'''
         raw = struct.unpack('<h', self.data.read()) [0]
-        m = raw & 0xFFF
-        e = (raw & 0xF000) >> 12
+        m = raw & 0xFFF;
+        e = (raw & 0xF000) >> 12;
         return 0.01 * (m << e)
 
 class BatterySensor(SensorBase):
@@ -481,65 +486,86 @@ def main():
     # Some sensors (e.g., temperature, accelerometer) need some time for initialization.
     # Not waiting here after enabling a sensor, the first read value might be empty or incorrect.
     time.sleep(1.0)
+
     counter=1
     while True:
        if arg.temperature or arg.all:
            print('Temp: ', tag.IRtemperature.read())
-           TEMPERATURE = tag.IRtemperature.read()
        if arg.humidity or arg.all:
            print("Humidity: ", tag.humidity.read())
-           HUMIDITY = tag.humidity.read()
-           # Define the JSON message to send to IoT Hub.
-           #MSG_TXT = "{\"temperature\": 'TEMPERATURE',\"humidity\": 'HUMIDITY'}"
-           #def send_confirmation_callback(message, result, user_context):
-           # print ( "IoT Hub responded to message with status: %s" % (result) )
-           
-           def iothub_client_init():
-            # Create an IoT Hub client
-            # client.set_option("auto_url_encode_decode", True)
-            client = IoTHubClient(CONNECTION_STRING, PROTOCOL)
-            return client
-           
-           def iothub_client_telemetry_sample_run():
-            try:
-              client = iothub_client_init()
-              print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
-              while True:
-            # Build the message with real telemetry values.
-                temperature = TEMPERATURE
-                humidity = HUMIDITY
-                msg_txt_formatted = (temperature, humidity)
-                message = IoTHubMessage(msg_txt_formatted)
-            # Add a custom application property to the message.
-            # An IoT hub can filter on these properties without access to the message body.
-                prop_map = message.properties()
-                if temperature > 30:
-                    prop_map.add("temperatureAlert", "true")
-                else:
-                    prop_map.add("temperatureAlert", "false")
-            # Send the message.
-                print( "Sending message: %s" % message.get_string() )
-                client.send_event_async(message, send_confirmation_callback, None)
-                time.sleep(1)
-            except IoTHubError as iothub_error:
-                print ( "Unexpected error %s from IoTHub" % iothub_error )
-                return
-            except KeyboardInterrupt:
-                print ( "IoTHubClient sample stopped" )
-
+       if arg.barometer or arg.all:
+           print("Barometer: ", tag.barometer.read())
+       if arg.accelerometer or arg.all:
+           print("Accelerometer: ", tag.accelerometer.read())
+       if arg.magnetometer or arg.all:
+           print("Magnetometer: ", tag.magnetometer.read())
+       if arg.gyroscope or arg.all:
+           print("Gyroscope: ", tag.gyroscope.read())
+       if (arg.light or arg.all) and tag.lightmeter is not None:
+           print("Light: ", tag.lightmeter.read())
+       if arg.battery or arg.all:
+           print("Battery: ", tag.battery.read())
        if counter >= arg.count and arg.count != 0:
            break
        counter += 1
-       tag.waitForNotifications(arg.t)       
-       if __name__ == "__main__":
-            main()
-            if __name__ == '__main__':
-              print ( "IoT Hub Quickstart #1 - R device" )
-              print ( "Press Ctrl-C to exit" )
-              iothub_client_telemetry_sample_run()
-        
+       tag.waitForNotifications(arg.t)
+       # Define the JSON message to send to IoT Hub.
+                TEMPERATURE = tag.IRtemperature.read()
+                HUMIDITY = tag.humidity.read()
+                #MSG_TXT = "{\"temperature\": 'temp' ,\"humidity\": 'hum'}"
+                MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
+                def send_confirmation_callback(message, result, user_context):
+                    print ( "IoT Hub responded to message with status: %s" % (result) )
+
+                def iothub_client_init():
+                # Create an IoT Hub client
+                # client.set_option("auto_url_encode_decode", True)
+                    client = IoTHubClient(CONNECTION_STRING, PROTOCOL)
+                    return client
+
+                def iothub_client_telemetry_sample_run():
+
+                    try:
+                        client = iothub_client_init()
+                        print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
+
+                        while True:
+                            # Build the message with real telemetry values.
+                            temperature = temp
+                            humidity = hum
+                            msg_txt_formatted = MSG_TXT % (temperature, humidity)
+                            message = IoTHubMessage(msg_txt_formatted)
+                           # print("JSON payload = " + msg_txt_formatted)
+
+                            # Add a custom application property to the message.
+                            # An IoT hub can filter on these properties without access to the message body.
+                            prop_map = message.properties()
+                            if temperature > 30:
+                              prop_map.add("temperatureAlert", "true")
+                            else:
+                              prop_map.add("temperatureAlert", "false")
+
+                            # Send the message.
+                            print( "Sending message: %s" % message.get_string() )
+                            client.send_event_async(message, send_confirmation_callback, None)
+                            time.sleep(1)
+
+                    except IoTHubError as iothub_error:
+                        print ( "Unexpected error %s from IoTHub" % iothub_error )
+                        return
+                    except KeyboardInterrupt:
+                        print ( "IoTHubClient sample stopped" )
+
+                if __name__ == '__main__':
+                    print ( "IoT Hub Quickstart #1 - real device" )
+                    print ( "Press Ctrl-C to exit" )
+                    iothub_client_telemetry_sample_run()
+
     tag.disconnect()
     del tag
 
 if __name__ == "__main__":
     main()
+
+
+
