@@ -107,6 +107,7 @@ while True:
                 TEMPERATURE = temp
                 HUMIDITY = hum
                 MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
+                print  (MSG_TXT)
                 def send_confirmation_callback(message, result, user_context):
                     print ( "IoT Hub responded to message with status: %s" % (result) )
 
