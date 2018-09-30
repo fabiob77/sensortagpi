@@ -79,7 +79,7 @@ class IRTemperatureSensor(SensorBase):
         self.S0 = 6.4e-14
 
     def read(self):
-        '''Returns (ambient_temp, target_temp) in degC'''
+        '''Returns (ambient_temp) in degC'''
         # See http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#IR_Temperature_Sensor
         (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         tAmb = rawTamb / 128.0
@@ -91,7 +91,7 @@ class IRTemperatureSensor(SensorBase):
         fObj = calcPoly(self.Cpoly, Vobj-Vos)
 
         tObj = math.pow( math.pow(tDie,4.0) + (fObj/S), 0.25 )
-        return (tAmb, tObj - self.zeroC)
+        return (tAmb)
 
 
 class IRTemperatureSensorTMP007(SensorBase):
@@ -105,12 +105,12 @@ class IRTemperatureSensorTMP007(SensorBase):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (ambient_temp, target_temp) in degC'''
+        '''Returns (ambient_temp) in degC'''
         # http://processors.wiki.ti.com/index.php/CC2650_SensorTag_User's_Guide?keyMatch=CC2650&tisearch=Search-EN
         (rawTobj, rawTamb) = struct.unpack('<hh', self.data.read())
         tObj = (rawTobj >> 2) * self.SCALE_LSB;
         tAmb = (rawTamb >> 2) * self.SCALE_LSB;
-        return (tAmb, tObj)
+        return (tAmb)
 
 class AccelerometerSensor(SensorBase):
     svcUUID  = _TI_UUID(0xAA10)
@@ -187,11 +187,11 @@ class HumiditySensor(SensorBase):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (ambient_temp, rel_humidity)'''
+        '''Returns (rel_humidity)'''
         (rawT, rawH) = struct.unpack('<HH', self.data.read())
         temp = -46.85 + 175.72 * (rawT / 65536.0)
         RH = -6.0 + 125.0 * ((rawH & 0xFFFC)/65536.0)
-        return (temp, RH)
+        return (RH)
 
 class HumiditySensorHDC1000(SensorBase):
     svcUUID  = _TI_UUID(0xAA20)
@@ -202,11 +202,11 @@ class HumiditySensorHDC1000(SensorBase):
         SensorBase.__init__(self, periph)
 
     def read(self):
-        '''Returns (ambient_temp, rel_humidity)'''
+        '''Returns (rel_humidity)'''
         (rawT, rawH) = struct.unpack('<HH', self.data.read())
         temp = -40.0 + 165.0 * (rawT / 65536.0)
         RH = 100.0 * (rawH/65536.0)
-        return (temp, RH)
+        return (RH)
 
 class MagnetometerSensor(SensorBase):
     svcUUID  = _TI_UUID(0xAA30)
@@ -493,6 +493,8 @@ def main():
            print('Temp: ', tag.IRtemperature.read())
        if arg.humidity or arg.all:
            print("Humidity: ", tag.humidity.read())
+           temperature = tag.IRtemperature.read()
+           humidity = tag.humidity.read()
            # Define the JSON message to send to IoT Hub.
            MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
            def send_confirmation_callback(message, result, user_context):
@@ -509,8 +511,8 @@ def main():
 
                    while True:
                         # Build the message with real telemetry values.
-                        temperature = tag.IRtemperature.read()
-                        humidity = tag.humidity.read()
+                        #temperature = tag.IRtemperature.read()
+                        #humidity = tag.humidity.read()
                         msg_txt_formatted = MSG_TXT % (temperature, humidity)
                         message = IoTHubMessage(msg_txt_formatted)
                         # print("JSON payload = " + msg_txt_formatted)
@@ -534,10 +536,10 @@ def main():
                except KeyboardInterrupt:
                     print ( "IoTHubClient sample stopped" )
 
-           if __name__ == '__main__':
-                print ( "IoT Hub Quickstart #1 - real device" )
-                print ( "Press Ctrl-C to exit" )
-                iothub_client_telemetry_sample_run()
+          # if __name__ == '__main__':
+           #     print ( "IoT Hub Quickstart #1 - real device" )
+            #    print ( "Press Ctrl-C to exit" )
+                
 
        if arg.barometer or arg.all:
            print("Barometer: ", tag.barometer.read())
@@ -549,6 +551,7 @@ def main():
     del tag
 
 if __name__ == "__main__":
+    iothub_client_telemetry_sample_run()
     main()
 
 
