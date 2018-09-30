@@ -91,7 +91,7 @@ while True:
                 print("tempC : ", temp, "C\t\ttempF : ",CtoF(temp),"F\t\tHumidity =", hum,"%\r\n")
                 
                 lastHum = hum          # save temp & humidity values so that there is no update to the RGB LCD
-                #ftemp = CtoF(temp)     # unless the value changes
+                ftemp = CtoF(temp)     # unless the value changes
                 ftemp = temp     # unless the value changes
                 lastTemp = ftemp       # this reduces the flashing of the display
                 # print "ftemp = ",ftemp,"  temp = ",temp   # this was just for test and debug
@@ -130,7 +130,7 @@ while True:
                             humidity = hum
                             msg_txt_formatted = MSG_TXT % (temperature, humidity)
                             message = IoTHubMessage(msg_txt_formatted)
-                            print("JSON payload = " + msg_txt_formatted)
+                           # print("JSON payload = " + msg_txt_formatted)
 
                             # Add a custom application property to the message.
                             # An IoT hub can filter on these properties without access to the message body.
