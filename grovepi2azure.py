@@ -85,3 +85,4 @@ while True:
                 setText("Temp:" + t + "C      " + "Humidity :" + h + "%") # update the RGB LCD display
                 
     except (IOError,TypeError) as e:
+        print("Error" + str(e))
