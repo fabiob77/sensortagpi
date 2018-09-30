@@ -106,8 +106,8 @@ while True:
                 # Define the JSON message to send to IoT Hub.
                 TEMPERATURE = temp
                 HUMIDITY = hum
-                MSG_TXT = "{\"temperature\": 'temp' ,\"humidity\": 'hum'}"
-                print  (MSG_TXT)
+                #MSG_TXT = "{\"temperature\": 'temp' ,\"humidity\": 'hum'}"
+                msg_txt = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
                 def send_confirmation_callback(message, result, user_context):
                     print ( "IoT Hub responded to message with status: %s" % (result) )
 
@@ -129,6 +129,7 @@ while True:
                             humidity = hum
                             msg_txt_formatted = (temperature, humidity)
                             message = IoTHubMessage(msg_txt_formatted)
+                            print("JSON payload = " + msg_txt_formatted)
 
                             # Add a custom application property to the message.
                             # An IoT hub can filter on these properties without access to the message body.
