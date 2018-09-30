@@ -502,6 +502,7 @@ def main():
        tag.disconnect()
        temperature = tag.IRtemperature.read()
        humidity = tag.humidity.read()
+       del tag
        # Define the JSON message to send to IoT Hub.
        MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
        def send_confirmation_callback(message, result, user_context):
@@ -548,8 +549,6 @@ def main():
                 print ( "Press Ctrl-C to exit" )
                 iothub_client_telemetry_sample_run()
        
-    del tag
-
 if __name__ == "__main__":
     main()
 
