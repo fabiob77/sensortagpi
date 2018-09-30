@@ -86,7 +86,6 @@ class IRTemperatureSensor(SensorBase):
         global temp2amb
         (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         temp1 = (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
-        print(temp1[1])
         temp2amb = (temp1[1] /128.0)
         tAmb = rawTamb / 128.0
         print(temp2amb)
@@ -502,7 +501,8 @@ def main():
     counter=1
     while True:
        if arg.temperature or arg.all:
-           print('Temp: ', tag.IRtemperature.read())
+           #print('Temp: ', tag.IRtemperature.read())
+           print('Temp: ', temp2amb)
        if arg.humidity or arg.all:
            print("Humidity: ", tag.humidity.read())
        if arg.barometer or arg.all:
@@ -512,12 +512,12 @@ def main():
        counter += 1
        tag.waitForNotifications(arg.t)
        tag.disconnect()
-       #temperature = temp1
-       #humidity = hum1
-       del tag
-       # Define the JSON message to send to IoT Hub.
        temperature = temp2amb
        humidity = hum1
+       del tag
+       # Define the JSON message to send to IoT Hub.
+       #temperature = temp2amb
+       #humidity = hum1
        MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
        def send_confirmation_callback(message, result, user_context):
            print ( "IoT Hub responded to message with status: %s" % (result) )
