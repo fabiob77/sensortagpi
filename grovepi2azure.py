@@ -103,6 +103,10 @@ while True:
                 # print "(",bgList[0],",",bgList[1],",",bgList[2],")"   # this was to test and debug color value list
                 setRGB(bgList[0],bgList[1],bgList[2])   # parse our list into the color settings
                 setText("Temp:" + t + "C      " + "Humidity :" + h + "%") # update the RGB LCD display
+                # Define the JSON message to send to IoT Hub.
+                TEMPERATURE = temp
+                HUMIDITY = hum
+                MSG_TXT = "{\"temperature\": %.2f,\"humidity\": %.2f}"
                 def send_confirmation_callback(message, result, user_context):
                     print ( "IoT Hub responded to message with status: %s" % (result) )
 
