@@ -509,8 +509,8 @@ def main():
 
                    while True:
                         # Build the message with real telemetry values.
-                        temperature = (tAmb)
-                        humidity = (RH)
+                        temperature = tag.IRtemperature.read()
+                        humidity = tag.humidity.read()
                         msg_txt_formatted = MSG_TXT % (temperature, humidity)
                         message = IoTHubMessage(msg_txt_formatted)
                         # print("JSON payload = " + msg_txt_formatted)
