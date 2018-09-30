@@ -83,10 +83,13 @@ class IRTemperatureSensor(SensorBase):
         '''Returns (ambient_temp) in degC'''
         # See http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#IR_Temperature_Sensor
         global temp1
+        global temp2amb
         (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         temp1 = (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         print(temp1[1])
+        temp2amb = (temp1[1])
         tAmb = rawTamb / 128.0
+        print(temp2amb)
         Vobj = 1.5625e-7 * rawVobj
         
 
@@ -513,7 +516,7 @@ def main():
        #humidity = hum1
        del tag
        # Define the JSON message to send to IoT Hub.
-       temperature = temp1
+       temperature = temp2amb
        humidity = hum1
        MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
        def send_confirmation_callback(message, result, user_context):
