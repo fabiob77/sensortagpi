@@ -194,7 +194,11 @@ class HumiditySensor(SensorBase):
 
     def read(self):
         '''Returns (rel_humidity)'''
+        global hum1
+        (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
+        hum1 = (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         (rawT, rawH) = struct.unpack('<HH', self.data.read())
+        print(hum1[1])
         temp = -46.85 + 175.72 * (rawT / 65536.0)
         RH = -6.0 + 125.0 * ((rawH & 0xFFFC)/65536.0)
         return (RH)
@@ -507,7 +511,7 @@ def main():
        tag.waitForNotifications(arg.t)
        tag.disconnect()
        temperature = temp1
-       humidity = tag.humidity.read()
+       humidity = hum1
        del tag
        # Define the JSON message to send to IoT Hub.
        MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
