@@ -91,8 +91,6 @@ class IRTemperatureSensor(SensorBase):
         print(temp2amb)
         Vobj = 1.5625e-7 * rawVobj
         
-
-
         tDie = tAmb + self.zeroC
         S   = self.S0 * calcPoly(self.Apoly, tDie-self.tRef)
         Vos = calcPoly(self.Bpoly, tDie-self.tRef)
@@ -201,7 +199,8 @@ class HumiditySensor(SensorBase):
         hum1 = (rawT, rawH) = struct.unpack('<HH', self.data.read())
         print(hum1[1])
         temp = -46.85 + 175.72 * (rawT / 65536.0)
-        RH = -6.0 + 125.0 * ((rawH & 0xFFFC)/65536.0)
+        #RH = -6.0 + 125.0 * ((rawH & 0xFFFC)/65536.0)
+        RH = -6.0 + 125.0 * ((hum1[1] & 0xFFFC)/65536.0)
         return (RH)
 
 class HumiditySensorHDC1000(SensorBase):
