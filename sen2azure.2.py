@@ -4,7 +4,7 @@ import math
 import random
 import time
 import sys
-global temp1
+
 
 # Using the Python Device SDK for IoT Hub:
 #   https://github.com/Azure/azure-iot-sdk-python
@@ -82,14 +82,13 @@ class IRTemperatureSensor(SensorBase):
     def read(self):
         '''Returns (ambient_temp) in degC'''
         # See http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#IR_Temperature_Sensor
+        global temp1
         (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         temp1 = (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         print(temp1[1])
         tAmb = rawTamb / 128.0
         Vobj = 1.5625e-7 * rawVobj
-        #policy_id = ((rawVobj,), (rawTamb))
-        #for i in policy_id:
-        #tempAmb = print i[1]
+        
 
 
         tDie = tAmb + self.zeroC
