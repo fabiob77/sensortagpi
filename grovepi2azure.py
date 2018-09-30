@@ -6,6 +6,26 @@
 import decimal
 from grovepi import *
 from grove_rgb_lcd import *
+import random
+import time
+import sys
+
+# Using the Python Device SDK for IoT Hub:
+#   https://github.com/Azure/azure-iot-sdk-python
+# The sample connects to a device-specific MQTT endpoint on your IoT Hub.
+import iothub_client
+# pylint: disable=E0611
+from iothub_client import IoTHubClient, IoTHubClientError, IoTHubTransportProvider, IoTHubClientResult
+from iothub_client import IoTHubMessage, IoTHubMessageDispositionResult, IoTHubError, DeviceMethodReturnValue
+
+# The device connection string to authenticate the device with your IoT hub.
+# Using the Azure CLI:
+# az iot hub device-identity show-connection-string --hub-name {YourIoTHubName} --device-id MyNodeDevice --output table
+CONNECTION_STRING = "HostName=fbhub001.azure-devices.net;DeviceId=CC2541-fb-Room2;SharedAccessKey=q8wg+U5a+oZaPxEMmuOr7xa8zTgILqhXMa8yiqdCgBY="
+
+# Using the MQTT protocol.
+PROTOCOL = IoTHubTransportProvider.MQTT
+MESSAGE_TIMEOUT = 10000
 
 dht_sensor_port = 7     # Connect the DHt sensor to port 7
 lastTemp = 0.1          # initialize a floating point temp variable
@@ -83,6 +103,51 @@ while True:
                 # print "(",bgList[0],",",bgList[1],",",bgList[2],")"   # this was to test and debug color value list
                 setRGB(bgList[0],bgList[1],bgList[2])   # parse our list into the color settings
                 setText("Temp:" + t + "C      " + "Humidity :" + h + "%") # update the RGB LCD display
+                def send_confirmation_callback(message, result, user_context):
+                    print ( "IoT Hub responded to message with status: %s" % (result) )
+
+                def iothub_client_init():
+                # Create an IoT Hub client
+                # client.set_option("auto_url_encode_decode", True)
+                    client = IoTHubClient(CONNECTION_STRING, PROTOCOL)
+                    return client
+
+                def iothub_client_telemetry_sample_run():
+
+                    try:
+                        client = iothub_client_init()
+                        print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
+
+                        while True:
+                            # Build the message with simulated telemetry values.
+                            temperature = temp
+                            humidity = hum
+                            msg_txt_formatted = (temperature, humidity)
+                            message = IoTHubMessage(msg_txt_formatted)
+
+                            # Add a custom application property to the message.
+                            # An IoT hub can filter on these properties without access to the message body.
+                            prop_map = message.properties()
+                            if temperature > 30:
+                              prop_map.add("temperatureAlert", "true")
+                            else:
+                              prop_map.add("temperatureAlert", "false")
+
+                            # Send the message.
+                            print( "Sending message: %s" % message.get_string() )
+                            client.send_event_async(message, send_confirmation_callback, None)
+                            time.sleep(1)
+
+                    except IoTHubError as iothub_error:
+                        print ( "Unexpected error %s from IoTHub" % iothub_error )
+                        return
+                    except KeyboardInterrupt:
+                        print ( "IoTHubClient sample stopped" )
+
+                if __name__ == '__main__':
+                    print ( "IoT Hub Quickstart #1 - Simulated device" )
+                    print ( "Press Ctrl-C to exit" )
+                    iothub_client_telemetry_sample_run()
                 
     except (IOError,TypeError) as e:
         print("Error" + str(e))
