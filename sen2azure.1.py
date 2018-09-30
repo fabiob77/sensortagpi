@@ -493,6 +493,8 @@ def main():
            print('Temp: ', tag.IRtemperature.read())
        if arg.humidity or arg.all:
            print("Humidity: ", tag.humidity.read())
+           temperature = tag.IRtemperature.read()
+           humidity = tag.humidity.read()
            # Define the JSON message to send to IoT Hub.
            MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
            def send_confirmation_callback(message, result, user_context):
@@ -509,8 +511,8 @@ def main():
 
                    while True:
                         # Build the message with real telemetry values.
-                        temperature = tag.IRtemperature.read()
-                        humidity = tag.humidity.read()
+                        #temperature = tag.IRtemperature.read()
+                        #humidity = tag.humidity.read()
                         msg_txt_formatted = MSG_TXT % (temperature, humidity)
                         message = IoTHubMessage(msg_txt_formatted)
                         # print("JSON payload = " + msg_txt_formatted)
