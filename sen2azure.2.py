@@ -509,10 +509,12 @@ def main():
        counter += 1
        tag.waitForNotifications(arg.t)
        tag.disconnect()
-       temperature = temp1
-       humidity = hum1
+       #temperature = temp1
+       #humidity = hum1
        del tag
        # Define the JSON message to send to IoT Hub.
+       temperature = temp1
+       humidity = hum1
        MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
        def send_confirmation_callback(message, result, user_context):
            print ( "IoT Hub responded to message with status: %s" % (result) )
