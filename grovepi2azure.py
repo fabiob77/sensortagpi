@@ -24,7 +24,8 @@ from iothub_client import IoTHubMessage, IoTHubMessageDispositionResult, IoTHubE
 CONNECTION_STRING = "HostName=fbhub001.azure-devices.net;DeviceId=CC2541-fb-Room2;SharedAccessKey=q8wg+U5a+oZaPxEMmuOr7xa8zTgILqhXMa8yiqdCgBY="
 
 # Using the MQTT protocol.
-PROTOCOL = IoTHubTransportProvider.MQTT
+#PROTOCOL = IoTHubTransportProvider.MQTT
+PROTOCOL = IoTHubTransportProvider.AMQP
 MESSAGE_TIMEOUT = 10000
 
 dht_sensor_port = 7     # Connect the DHt sensor to port 7
