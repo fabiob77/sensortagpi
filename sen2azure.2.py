@@ -87,7 +87,7 @@ class IRTemperatureSensor(SensorBase):
         (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         temp1 = (rawVobj, rawTamb) = struct.unpack('<hh', self.data.read())
         print(temp1[1])
-        temp2amb = (temp1[1])
+        temp2amb = (temp1[1] /128.0)
         tAmb = rawTamb / 128.0
         print(temp2amb)
         Vobj = 1.5625e-7 * rawVobj
