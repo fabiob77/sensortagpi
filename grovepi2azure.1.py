@@ -143,6 +143,7 @@ while True:
                         print( "Sending message: %s" % message.get_string() )
                         client.send_event_async(message, send_confirmation_callback, None)
                         time.sleep(1)
+                        iothub_client_telemetry_sample_run()
                     #except IoTHubError as iothub_error:
                     #    print ( "Unexpected error %s from IoTHub" % iothub_error )
                     #    return
@@ -156,4 +157,3 @@ while True:
                 
     except (IOError,TypeError) as e:
         print("Error" + str(e))
-        iothub_client_telemetry_sample_run()
