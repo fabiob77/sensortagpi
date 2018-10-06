@@ -56,7 +56,7 @@ def calcColorAdj(variance):     # Calc the adjustment value of the background co
 # Define the JSON message to send to IoT Hub.
 MSG_TXT = "{\"temperature\": %.2f, \"humidity\": %.2f}"
 def send_confirmation_callback(message, result, user_context):
-    Print ( "IoT Hub responded to message with status: %s" % (result) )
+    print ( "IoT Hub responded to message with status: %s" % (result) )
 def iothub_client_init():
     # Create an IoT Hub client
     # client.set_option("auto_url_encode_decode", True)
