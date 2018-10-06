@@ -143,16 +143,17 @@ while True:
                         print( "Sending message: %s" % message.get_string() )
                         client.send_event_async(message, send_confirmation_callback, None)
                         time.sleep(1)
-                    except IoTHubError as iothub_error:
-                        print ( "Unexpected error %s from IoTHub" % iothub_error )
-                        return
-                    except KeyboardInterrupt:
-                        print ( "IoTHubClient sample stopped" )
+                    #except IoTHubError as iothub_error:
+                    #    print ( "Unexpected error %s from IoTHub" % iothub_error )
+                    #    return
+                    #except KeyboardInterrupt:
+                    #    print ( "IoTHubClient sample stopped" )
 
-                if __name__ == '__main__':
-                    print ( "IoT Hub Quickstart #1 - real device" )
-                    print ( "Press Ctrl-C to exit" )
-                    iothub_client_telemetry_sample_run()
+                #if __name__ == '__main__':
+                #    print ( "IoT Hub Quickstart #1 - real device" )
+                #    print ( "Press Ctrl-C to exit" )
+                    
                 
     except (IOError,TypeError) as e:
         print("Error" + str(e))
+        iothub_client_telemetry_sample_run()
