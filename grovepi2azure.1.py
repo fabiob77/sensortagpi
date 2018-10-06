@@ -106,7 +106,7 @@ while True:
                     #print("lowF : ",tooLow,"F\t\tjustRight : ",justRight,"F\t\ttoHigh : ",tooHigh,"F")                       # if no monitor display
                         print("tempC : ", temp, "C\t\ttempF : ",CtoF(temp),"F\t\tHumidity =", hum,"%\r\n")
                 
-                        lastHum = hum          # save temp & humidity values so that there is no update to the RGB LCD
+                        #lastHum = hum          # save temp & humidity values so that there is no update to the RGB LCD
                         ftemp = CtoF(temp)     # unless the value changes
                         ftemp = temp     # unless the value changes
                         #lastTemp = ftemp       # this reduces the flashing of the display
