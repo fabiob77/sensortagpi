@@ -80,6 +80,8 @@ def calcBG(ftemp):
 while True:
 
     try:
+        client = iothub_client_init()
+        print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
         temp = 0.01
         hum = 0.01
         [ temp,hum ] = dht(dht_sensor_port,0)       #Get the temperature and Humidity from the DHT sensor
@@ -120,8 +122,7 @@ while True:
 
                 def iothub_client_telemetry_sample_run():
 
-                    client = iothub_client_init()
-                    print ( "IoT Hub device sending periodic messages, press Ctrl-C to exit" )
+                    
 
                     while True:
                         # Build the message with real telemetry values.
