@@ -105,8 +105,8 @@ while True:
                 setText("Temp:" + t + "C      " + "Humidity :" + h + "%") # update the RGB LCD display
                 
                 # Define the JSON message to send to IoT Hub.
-                TEMPERATURE = temp
-                HUMIDITY = hum
+                #TEMPERATURE = temp
+                #HUMIDITY = hum
                 #MSG_TXT = "{\"temperature\": 'temp' ,\"humidity\": 'hum'}"
                 MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
                 def send_confirmation_callback(message, result, user_context):
