@@ -58,6 +58,13 @@ def iothub_client_init():
     # client.set_option("auto_url_encode_decode", True)
     client = IoTHubClient(CONNECTION_STRING, PROTOCOL)
     return client
+# Define the JSON message to send to IoT Hub.
+#TEMPERATURE = temp
+#HUMIDITY = hum
+#MSG_TXT = "{\"temperature\": 'temp' ,\"humidity\": 'hum'}"
+MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
+def send_confirmation_callback(message, result, user_context):
+    Print ( "IoT Hub responded to message with status: %s" % (result) )
 
 def calcBG(ftemp):
     "This calculates the color value for the background"
@@ -99,54 +106,46 @@ while True:
                     #print("lowF : ",tooLow,"F\t\tjustRight : ",justRight,"F\t\ttoHigh : ",tooHigh,"F")                       # if no monitor display
                         print("tempC : ", temp, "C\t\ttempF : ",CtoF(temp),"F\t\tHumidity =", hum,"%\r\n")
                 
-                    lastHum = hum          # save temp & humidity values so that there is no update to the RGB LCD
-                    ftemp = CtoF(temp)     # unless the value changes
-                    ftemp = temp     # unless the value changes
-                    lastTemp = ftemp       # this reduces the flashing of the display
-                    # print "ftemp = ",ftemp,"  temp = ",temp   # this was just for test and debug
+                        lastHum = hum          # save temp & humidity values so that there is no update to the RGB LCD
+                        ftemp = CtoF(temp)     # unless the value changes
+                        ftemp = temp     # unless the value changes
+                        lastTemp = ftemp       # this reduces the flashing of the display
+                        # print "ftemp = ",ftemp,"  temp = ",temp   # this was just for test and debug
                 
-                    bgList = calcBG(ftemp)           # Calculate background colors
+                        bgList = calcBG(ftemp)           # Calculate background colors
                 
-                    t = str(ftemp)   # "stringify" the display values
-                    h = str(hum)
-                    # print "(",bgList[0],",",bgList[1],",",bgList[2],")"   # this was to test and debug color value list
-                    setRGB(bgList[0],bgList[1],bgList[2])   # parse our list into the color settings
-                    setText("Temp:" + t + "C      " + "Humidity :" + h + "%") # update the RGB LCD display
+                        t = str(ftemp)   # "stringify" the display values
+                        h = str(hum)
+                        # print "(",bgList[0],",",bgList[1],",",bgList[2],")"   # this was to test and debug color value list
+                        setRGB(bgList[0],bgList[1],bgList[2])   # parse our list into the color settings
+                        setText("Temp:" + t + "C      " + "Humidity :" + h + "%") # update the RGB LCD display
                 
-                    # Define the JSON message to send to IoT Hub.
-                    #TEMPERATURE = temp
-                    #HUMIDITY = hum
-                    #MSG_TXT = "{\"temperature\": 'temp' ,\"humidity\": 'hum'}"
-                    MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
-                    def send_confirmation_callback(message, result, user_context):
-                        print ( "IoT Hub responded to message with status: %s" % (result) )
-                    # Build the message with real telemetry values.
-                    temperature = temp
-                    humidity = hum
-                    msg_txt_formatted = MSG_TXT % (temperature, humidity)
-                    message = IoTHubMessage(msg_txt_formatted)
-                    # print("JSON payload = " + msg_txt_formatted)
+                    
+                        # Build the message with real telemetry values.
+                        temperature = temp
+                        humidity = hum
+                        msg_txt_formatted = MSG_TXT % (temperature, humidity)
+                        message = IoTHubMessage(msg_txt_formatted)
+                        # print("JSON payload = " + msg_txt_formatted)
 
-                    #Add a custom application property to the message.
-                    # An IoT hub can filter on these properties without access to the message body.
-                    #prop_map = message.properties()
-                    #if temperature > 30:
-                    #  prop_map.add("temperatureAlert", "true")
-                    #else:
-                    #  prop_map.add("temperatureAlert", "false")
+                        #Add a custom application property to the message.
+                        # An IoT hub can filter on these properties without access to the message body.
+                        #prop_map = message.properties()
+                        #if temperature > 30:
+                        #  prop_map.add("temperatureAlert", "true")
+                        #else:
+                        #  prop_map.add("temperatureAlert", "false")
 
-                    # Send the message.
-                    print( "Sending message: %s" % message.get_string() )
-                    client.send_event_async(message, send_confirmation_callback, None)
-                    time.sleep(1)
+                        # Send the message.
+                        print( "Sending message: %s" % message.get_string() )
+                        client.send_event_async(message, send_confirmation_callback, None)
+                        time.sleep(1)
                 except IoTHubError as iothub_error:
                     print ( "Unexpected error %s from IoTHub" % iothub_error )
                     return
                 except KeyboardInterrupt:
                     print ( "IoTHubClient sample stopped" )
-
-            #if __name__ == '__main__':
-            #    iothub_client_telemetry_sample_run()
-                
                 except (IOError,TypeError) as e:
                     print("Error" + str(e))
+            if __name__ == '__main__':
+                iothub_client_telemetry_sample_run()
