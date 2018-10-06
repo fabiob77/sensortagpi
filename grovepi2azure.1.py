@@ -62,7 +62,8 @@ def iothub_client_init():
 #TEMPERATURE = temp
 #HUMIDITY = hum
 #MSG_TXT = "{\"temperature\": 'temp' ,\"humidity\": 'hum'}"
-MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temperature\": %.2f, \"Humidity\": %.2f}"
+#MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"temperature\": %.2f, \"humidity\": %.2f}"
+MSG_TXT = "{\"temperature\": %.2f, \"humidity\": %.2f}"
 def send_confirmation_callback(message, result, user_context):
     Print ( "IoT Hub responded to message with status: %s" % (result) )
 
