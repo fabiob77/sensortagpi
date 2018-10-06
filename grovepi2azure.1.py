@@ -109,7 +109,7 @@ while True:
                         lastHum = hum          # save temp & humidity values so that there is no update to the RGB LCD
                         ftemp = CtoF(temp)     # unless the value changes
                         ftemp = temp     # unless the value changes
-                        lastTemp = ftemp       # this reduces the flashing of the display
+                        #lastTemp = ftemp       # this reduces the flashing of the display
                         # print "ftemp = ",ftemp,"  temp = ",temp   # this was just for test and debug
                 
                         bgList = calcBG(ftemp)           # Calculate background colors
