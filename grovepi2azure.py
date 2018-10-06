@@ -144,7 +144,6 @@ while True:
                             print( "Sending message: %s" % message.get_string() )
                             client.send_event_async(message, send_confirmation_callback, None)
                             time.sleep(1)
-
                     except IoTHubError as iothub_error:
                         print ( "Unexpected error %s from IoTHub" % iothub_error )
                         return
