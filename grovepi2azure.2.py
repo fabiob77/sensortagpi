@@ -53,20 +53,15 @@ def calcColorAdj(variance):     # Calc the adjustment value of the background co
     if adj > 255:
         adj = 255
     return adj
+# Define the JSON message to send to IoT Hub.
+MSG_TXT = "{\"temperature\": %.2f, \"humidity\": %.2f}"
+def send_confirmation_callback(message, result, user_context):
+    Print ( "IoT Hub responded to message with status: %s" % (result) )
 def iothub_client_init():
     # Create an IoT Hub client
     # client.set_option("auto_url_encode_decode", True)
     client = IoTHubClient(CONNECTION_STRING, PROTOCOL)
     return client
-# Define the JSON message to send to IoT Hub.
-#TEMPERATURE = temp
-#HUMIDITY = hum
-#MSG_TXT = "{\"temperature\": 'temp' ,\"humidity\": 'hum'}"
-#MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"temperature\": %.2f, \"humidity\": %.2f}"
-MSG_TXT = "{\"temperature\": %.2f, \"humidity\": %.2f}"
-def send_confirmation_callback(message, result, user_context):
-    Print ( "IoT Hub responded to message with status: %s" % (result) )
-
 def calcBG(ftemp):
     "This calculates the color value for the background"
     variance = ftemp - justRight;   # Calculate the variance
