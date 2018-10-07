@@ -516,14 +516,14 @@ def main():
                     print("Humidity: ", tag.humidity.read())
                 if arg.barometer or arg.all:
                     print("Barometer: ", tag.barometer.read())
-                if counter >= arg.count and arg.count != 0:
-                    break
-                counter += 1
+                #if counter >= arg.count and arg.count != 0:
+                #    break
+                #counter += 1
                 tag.waitForNotifications(arg.t)
                 tag.disconnect()
                 temperature = tag.IRtemperature.read()
                 humidity = tag.humidity.read()
-                del tag
+                #del tag
                     # Define the JSON message to send to IoT Hub.
                     #temperature = temp2amb
                     #humidity = hum1
