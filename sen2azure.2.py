@@ -518,27 +518,27 @@ def main():
                     print("Barometer: ", tag.barometer.read())
                 if counter >= arg.count and arg.count != 0:
                     break
-                    counter += 1
-                    tag.waitForNotifications(arg.t)
-                    tag.disconnect()
-                    temperature = tag.IRtemperature.read()
-                    humidity = tag.humidity.read()
-                    del tag
+                counter += 1
+                tag.waitForNotifications(arg.t)
+                tag.disconnect()
+                temperature = tag.IRtemperature.read()
+                humidity = tag.humidity.read()
+                del tag
                     # Define the JSON message to send to IoT Hub.
                     #temperature = temp2amb
                     #humidity = hum1
-                    MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
-                    def send_confirmation_callback(message, result, user_context):
-                        print ( "IoT Hub responded to message with status: %s" % (result) )
+                MSG_TXT = "{\"DeviceRef\": \"CC2541-fb-Room2\",\"Temp\": %.2f, \"Humidity\": %.2f}"
+                def send_confirmation_callback(message, result, user_context):
+                    print ( "IoT Hub responded to message with status: %s" % (result) )
               
-                    msg_txt_formatted = MSG_TXT % (temperature, humidity)
-                    message = IoTHubMessage(msg_txt_formatted)
-                    # print("JSON payload = " + msg_txt_formatted)
+                msg_txt_formatted = MSG_TXT % (temperature, humidity)
+                message = IoTHubMessage(msg_txt_formatted)
+                # print("JSON payload = " + msg_txt_formatted)
 
-                    # Send the message.
-                    print( "Sending message: %s" % message.get_string() )
-                    client.send_event_async(message, send_confirmation_callback, None)
-                    time.sleep(1)
+                # Send the message.
+                print( "Sending message: %s" % message.get_string() )
+                client.send_event_async(message, send_confirmation_callback, None)
+                time.sleep(1)
 
             except IoTHubError as iothub_error:
                 print ( "Unexpected error %s from IoTHub" % iothub_error )
